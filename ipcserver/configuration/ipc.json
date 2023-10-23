@@ -1,7 +1,12 @@
 {
-  "name":"",
-  "verion":"",
-  "logLevel":"",
-  "loggerProvider":"",
-  "logData":true
+  "name":"ETP-IPCHost",
+  "verion":"1.0.0",
+  "logLevel":"info",
+  "loggerProvider":"console",
+  "logData":true,
+  "loggerProviderProperties": {
+    "fileMaxSize": "10MB",
+    "filePath": "c:\\Users\\nbdrgzq",
+    "fileName": "ETP-IPCHost-Logger"
+  }
 }

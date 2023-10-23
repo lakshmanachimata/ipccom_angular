@@ -1,8 +1,18 @@
 {
-  "name": "ipcserver",
+  "name": "etp-ipchost",
   "version": "0.0.0",
+  "description": "ETP-IPCHost for Desktop based Inter process communication between applications",
+  "main": "index1.js",
   "bin" : {
     "ipc-cli" : "./bin/ipc.js"
+  },
+  "scripts": {
+    "_test": "npm run debugbuild && node etp-ipchost/spec/testharness.js",
+    "test": "npm run ut_build && node _unit_js/spec/testharness.js",
+    "build":"node node_modules/webpack/bin/webpack.js && npm run packagify",
+    "debugbuild": "node_modules/.bin/tsc",
+    "ut_build": "node_modules/.bin/tsc -p spec/",
+    "packagify": "node tools/packagify.js"
   },
   "keywords" : [
     "etc",
@@ -11,14 +21,6 @@
   ],
   "author" :"ETP Development team",
   "license":"ISC",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build":"node node_modules/webpack/bin/webpack.js && npm run packagify",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
-  },
-  "private": true,
   "dependencies": {
     "rxjs": "~6.2.2",
     "http":"^0.0.1-security",
