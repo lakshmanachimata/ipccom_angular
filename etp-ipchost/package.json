@@ -1,6 +1,6 @@
 {
   "name": "etp-ipchost",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "ETP-IPCHost for Desktop based Inter process communication between applications",
   "main": "index1.js",
   "bin" : {
