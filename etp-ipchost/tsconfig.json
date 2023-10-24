@@ -25,7 +25,10 @@
       "node",
       "jasmine"
     ],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+      "tslib" : ["./node_modules/tslib/tslib.d.ts"]
+    }
   },
   "exclude": [
     "spec"
