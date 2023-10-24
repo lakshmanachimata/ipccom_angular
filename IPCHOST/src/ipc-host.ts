@@ -31,7 +31,7 @@ const enum evnetType {
  * Encapsulates server behaviors and exposes  methods for controlling IPCHost
  */
 
-export class IPCHOst  {
+export class IPCHost  {
   private readonly ipcHostPort = 8000;  //default port for IPC
   private readonly ipcHostPath = '/etpipchost';  //path
   private readonly ipcHostName = 'etpipchost.bankofamerica.com';  //host
@@ -44,7 +44,7 @@ export class IPCHOst  {
 
   constructor(logger : Logger ) {
     this.logger = logger
-    const cwd  = process.env.ipcCWD | process.cwd();
+    // const cwd  = process.env.ipcCWD | process.cwd();
     //this.ipcHost = new WebSocet.Server({port : this.default_ipc_port, path: this.etpipchostpath })
     //Mamascomment//const key = fs.readFileAsync(path.resolve(cwd, '../configuration/etpipchopstkey.pem'))
     //Mamascomment//const cert = fs.readFileAsync(path.resolve(cwd, '../configuration/etpipchopstcert.pem'))

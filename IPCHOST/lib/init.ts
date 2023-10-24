@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Logger, loggerFactory } from 'src/ipc-logger';
+import { Logger, loggerFactory } from '../src/ipc-logger';
 const IPCCLILOGGERFILE = 'ETP-IPCCLI-Logger';
 const cwd = process.env.ipcCWD || process.cwd()
 const ipcConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/ipc.json'), 'utf-8'))

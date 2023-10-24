@@ -1,41 +1,42 @@
-const fs = require("fs")
-const path = require("path")
+const fs = require("fs");
+const path = require("path");
 
 const root = process.cwd();
-const TARGETFOLDER = path.resolve(root, 'etp-ipchost')
-const SRCCONFIGFOLDER = path.resolve(root, 'configuration')
-const TARTCONFIGFOLDER = path.resolve(TARGETFOLDER, 'configuration')
+const TARGETFOLDER = path.resolve(root, 'etp-ipchost');
+const SRCCONFIGFOLDER = path.resolve(root, 'configuration');
+const TARGETTCONFIGFOLDER = path.resolve(TARGETFOLDER, 'configuration');
 
 const packagify = () => {
   copyConfiguration().
    then(done => {
       const reject = () =>  Promise.reject(new Error("Configuration folder creation failed"))
-      return done ? flattenProdDependency : reject();
+      return done ? flattenProdDependency() : reject();
    }).then(pkgs => {
-      return prodDepedencyResolver(pkgs)
+      return prodDependencyResolver(pkgs)
    }).then(done => {
     const reject = () =>  Promise.reject(new Error("Production dependency package copy failed"))
-    return done ? flattenProdDependency : reject();
-   }).then(done => done ? console.log('packagify completed successfully') : console.log('packagify failed'))
-   .catch(error => console.log(`An error occured with in packagify : ${error}`))
-}
+    return done ? cleanup() : reject();
+   }).then(done => done ? console.log('packagify completed successfully!!!') : console.log('packagify failed'))
+   .catch(error => console.log(`An error occurred with in packagify : ${error}`))
+};
 
 const copyConfiguration = () => {
-  console.log('with in copyConfiguration')
-  const fsPlus = require('fs-extra')
+  console.log('with in copyConfiguration');
+  const fsPlus = require('fs-extra');
   return new Promise((resolve, reject ) => {
     const targetFolderExists = fs.existsSync(TARGETFOLDER)
     const srcConfigFolderExists = fs.existsSync(SRCCONFIGFOLDER)
     if(targetFolderExists && srcConfigFolderExists) {
-      if(!fs.existsSync(TARTCONFIGFOLDER) && fs.mkdirSync(TARTCONFIGFOLDER)) {
-        fsPlus.copy(SRCCONFIGFOLDER,TARTCONFIGFOLDER, (error) => {
-          if(error) {
+      if(!fs.existsSync(TARGETTCONFIGFOLDER) && fs.mkdirSync(TARGETTCONFIGFOLDER)) {
+        fs.mkdirSync(TARGETTCONFIGFOLDER)
+        fsPlus.copy(SRCCONFIGFOLDER,TARGETTCONFIGFOLDER, (error) => {
+          if(error)
             reject(`An error occured while copying configuration folder Error : ${error}` )
-          }else {
-            console.log('configuration completed')
-            resolve()
-          }
-        })
+          else {
+            console.log('copyConfiguration completed!');
+            resolve(true)
+          };
+        });
       }
     }else{
       reject(new Error('copyConfiguration failed'))
@@ -62,8 +63,8 @@ const flattenProdDependency = () => {
   })
 }
 
-const prodDepedencyResolver = (packages) => {
-  console.log('with in prodDepedencyResolver')
+const prodDependencyResolver = (packages) => {
+  console.log('with in prodDependencyResolver')
   if( packages != undefined && packages != null && packages.length > 0 && typeof packages === "string") {
     const cp = require('child_process')
     return new Promise((resolve, reject )=> {
@@ -75,7 +76,7 @@ const prodDepedencyResolver = (packages) => {
         if(code) {
           reject(`child process existed with code ${code} and signal ${signal}`)
         }else{
-          console.log('prodDepedencyResolver completed!')
+          console.log('prodDependencyResolver completed!')
           resolve(true)
         }
       })
@@ -101,4 +102,4 @@ const cleanup = () => {
     resolve(true)
   })
 }
-packagify()
+packagify();

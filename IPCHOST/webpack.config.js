@@ -1,6 +1,6 @@
-const path = require("path")
-const nodeExternals = require("webpack-node-externals")
-const uglifyIt = require("uglifyjs-webpack-plugin")
+const path = require('path');
+const nodeExternals = require('webpack-node-externals');
+const uglifyIt = require("uglifyjs-webpack-plugin");
 module.exports = {
   entry : './bin/ipc.ts',
   output : {
@@ -9,7 +9,7 @@ module.exports = {
   },
   module: {
     rules : [{
-      test:'/\.ts$/',
+      test:/\.ts$/,
       use:'ts-loader'
     }]
   },

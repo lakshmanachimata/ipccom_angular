@@ -35,14 +35,14 @@ const enum logType {
 
 export class LoggerBase extends Observable<LogEntry> implements Logger {
   protected readonly _subject : Subject<LogEntry> = new Subject<LogEntry>();
-  private _ob = Observable<LogEntry>
-  private logLevel: String;
+  // private _ob = Observable<LogEntry>;
+  private logLevel: string;
   private logType: logType = logType.log;
   private logData: boolean;
 
-  constructor(logLevel: String , logData : boolean) {
+  constructor(logLevel: string , logData : boolean) {
     super()
-    this._ob = this._subject.asObservable()
+    // this._ob = this._subject.asObservable()
     //default loglevel error
     this.logLevel = (logLevel === "info" || logLevel === "error") ? logLevel.toLowerCase() : 'error'
     this.logData = logData
@@ -113,7 +113,7 @@ export class FileLogger extends LoggerBase {
   private outStream?;
   private logFileName: string;
   private subscription?;
-  constructor(logConfig : LogConfig, logLevel : String, logData : boolean) {
+  constructor(logConfig : LogConfig, logLevel : string, logData : boolean) {
     if(!logConfig) throw new Error("Log configuration is missing.Can't continue with ETP Logger setup")
     try {
       super(logLevel, logData)
