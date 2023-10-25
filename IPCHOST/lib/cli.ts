@@ -61,9 +61,10 @@ commandStore.set('stop', IPCStopCommand);
  * @param logger type of Logger
  */
 
-export const cliExecuteCommand =async (options: cliArgs, logger: Logger): Promise<number> => {
+export const cliExecuteCommand = async (options: cliArgs, logger: Logger): Promise<number> => {
   let retCode = 1
-  if(options && options.command && !(options.command !== '' && options.command !== undefined)){
+  logger.log("cliExecuteCommand cliArgs " + JSON.stringify(options))
+  if(options && options.command && (options.command !== '' && options.command !== undefined)){
     //pull a command
     const cmd: IPCCommandInterface<Logger> = <IPCCommandInterface<Logger>>commandStore. get(options.command);
     //execute it
