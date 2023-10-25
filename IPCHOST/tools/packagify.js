@@ -27,22 +27,25 @@ const copyConfiguration = () => {
     const targetFolderExists = fs.existsSync(TARGETFOLDER)
     const srcConfigFolderExists = fs.existsSync(SRCCONFIGFOLDER)
     if(targetFolderExists && srcConfigFolderExists) {
-      if(!fs.existsSync(TARGETTCONFIGFOLDER) && fs.mkdirSync(TARGETTCONFIGFOLDER)) {
+      if(!fs.existsSync(TARGETTCONFIGFOLDER) )
         fs.mkdirSync(TARGETTCONFIGFOLDER)
         fsPlus.copy(SRCCONFIGFOLDER,TARGETTCONFIGFOLDER, (error) => {
-          if(error)
+          if(error){
+            console.log('with in copyConfiguration2');
             reject(`An error occured while copying configuration folder Error : ${error}` )
+          }
           else {
             console.log('copyConfiguration completed!');
             resolve(true)
           };
         });
+        console.log('with in copyConfiguration3');
+      } else{
+        reject(new Error('copyConfiguration failed'))
       }
-    }else{
-      reject(new Error('copyConfiguration failed'))
-    }
-  })
-}
+    })
+  }
+
 
 const flattenProdDependency = () => {
   console.log('with in flattenProdDependency')
@@ -55,7 +58,7 @@ const flattenProdDependency = () => {
       })
     }
     if(pkgs.length) {
-      resolve(`flattenProdDependency Completed! Packages: ${pkgs}`)
+      console.log(`flattenProdDependency Completed! Packages: ${pkgs}`)
       resolve(pkgs)
     }else {
       reject(new Error("flattenProdDependency failed. No dependencies were copied"))
@@ -66,12 +69,14 @@ const flattenProdDependency = () => {
 const prodDependencyResolver = (packages) => {
   console.log('with in prodDependencyResolver')
   if( packages != undefined && packages != null && packages.length > 0 && typeof packages === "string") {
+    console.log("packages are " + packages)
     const cp = require('child_process')
     return new Promise((resolve, reject )=> {
       const installCmd = `npm install --prefix ${TARGETFOLDER}`;
       const npmRunChild = cp.spawn('npm', ['install', '--prefix', TARGETFOLDER, packages], {
         shell : true
-      })
+      });
+      //capture child exit event
       npmRunChild.on('exit', (code, signal) => {
         if(code) {
           reject(`child process existed with code ${code} and signal ${signal}`)
@@ -80,12 +85,15 @@ const prodDependencyResolver = (packages) => {
           resolve(true)
         }
       })
+      //listen for any errors from child
       npmRunChild.on('error', (error) => {
         reject(new Error(`child process failed with error ${error}`))
       })
+      //listen to the output from child process
       npmRunChild.stdout.on('data', (data) => {
         console.log(`Data from child streams stdout : ${data}`)
       })
+      //listen to any errors from child process
       npmRunChild.stderr.on('data', (data) => {
         console.log(`Data from child streams stderr : ${data}`)
       })
