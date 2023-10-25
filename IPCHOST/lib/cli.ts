@@ -36,7 +36,7 @@ class IPCStopCommand implements IPCCliCommand {
  */
 
 
-class IPCSatCommand implements IPCCliCommand {
+class IPCStartCommand implements IPCCliCommand {
   private ipcHost : IPCHost;
   constructor(logger : Logger) {
     this.ipcHost = new IPCHost(logger)
@@ -45,4 +45,38 @@ class IPCSatCommand implements IPCCliCommand {
     const retCode = await this.ipcHost.start();
     return retCode
   }
+}
+
+/**
+ * AppLauncher cli command store
+ */
+
+const commandStore = new Map<string, IPCCommandInterface<Logger>>();
+commandStore.set('start', IPCStartCommand);
+commandStore.set('stop', IPCStopCommand);
+
+/**
+ * executeCommand function
+ * @param option type of cliArgs
+ * @param logger type of Logger
+ */
+
+export const cliExecuteCommand =async (options: cliArgs, logger: Logger): Promise<number> => {
+  let retCode = 1
+  if(options && options.command && !(options.command !== '' && options.command !== undefined)){
+    //pull a command
+    const cmd: IPCCommandInterface<Logger> = <IPCCommandInterface<Logger>>commandStore. get(options.command);
+    //execute it
+    retCode = cmd ? await new cmd(logger).execute() : 1;
+    if(retCode === 0) {
+      logger.log('ETP-IPCHost strted');
+    }
+    else {
+      logger.error('Unable to start ETP-IPCHost');
+    }
+  } else {
+    logger.error('Valid IPC CLI commands are start and stop, It can not be empty')
+    retCode = 1
+  }
+  return retCode;
 }
