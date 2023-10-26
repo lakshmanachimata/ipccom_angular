@@ -264,11 +264,11 @@ private handleInitialize(ws: WebSocket, data:any) {
         return value.clientSessionId.toLowerCase() === clientSessionId.toLowerCase()
       else return false;
     })
+    return appWithClients.length > 1 ? true : false;
   }else {
     const appWithClients = matchedAppArray.filter(value => value.clientSessionId === null);
     return appWithClients.length > 1 ? true : false;
   }
-  return false;
  }
 
  /**

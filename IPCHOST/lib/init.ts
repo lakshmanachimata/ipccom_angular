@@ -21,7 +21,7 @@ ipcConfig.loggerProviderProperties.filePath = ipcConfig.loggerProviderProperties
 const ipcLogger : Logger = loggerFactory(ipcConfig)
 ipcLogger.info("Desktop directory path is " + desktopDir)
 const args = process.argv.slice(2)
-if( !args || args.length == 0) {
+if( !args || args.length === 0) {
   ipcLogger.info('IPC Cli is invoked without any parameters. It is going to run with start as default command')
 }
 const cmdArgs: cliArgs = {command: args[0]  ? args[0] : 'start' };
