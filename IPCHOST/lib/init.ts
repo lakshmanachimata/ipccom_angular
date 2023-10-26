@@ -8,7 +8,7 @@ import { cliExecuteCommand, cliArgs } from './cli';
 const IPCCLILOGGERFILE = 'ETP-IPCCLI-Logger';
 const cwd = process.env.ipcCWD || process.cwd()
 const ipcConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/ipc.json'), 'utf-8'))
-const ipcAppConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/providers.json'), 'utf-8'))
+let ipcAppConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/providers.json'), 'utf-8'))
 
 if(!ipcConfig) {
   console.error('ETP IPC Host confiuration missing. Unable to start')
@@ -19,58 +19,38 @@ const homeDir = os.homedir()
 const desktopDir = `${homeDir}/Desktop`;
 
 
-// const getAppConfigData = async() => {
-//   return new Promise((resolve, reject) => {
-//     http.get('http://localhost:8000/', (res) => {
-//       const { statusCode } = res;
-//       const contentType = res.headers['content-type'];
+const ipcLogger : Logger = loggerFactory(ipcConfig)
 
-//       let error;
-//       // Any 2xx status code signals a successful response but
-//       // here we're only checking for 200.
-//       if (statusCode !== 200) {
-//         error = new Error('Request Failed.\n' +
-//                           `Status Code: ${statusCode}`);
-//       } else if (!/^application\/json/.test(contentType)) {
-//         error = new Error('Invalid content-type.\n' +
-//                           `Expected application/json but received ${contentType}`);
-//       }
-//       if (error) {
-//         // console.error(error.message);
-//         // Consume response data to free up memory
-//         reject(error)
-//         res.resume();
-//         return;
-//       }
+const getAppConfigData = async() => {
+  return new Promise((resolve, reject) => {
+    try {
+      var options = {
+        host: 'localhost',
+        port:4000,
+        path: ''
+      };
+      var req = http.get(options, function(res) {
+        let rawData = '';
+        res.on('data', function(chunk) {
+          rawData += chunk;
+        }).on('end', function() {
+          var body = JSON.parse(rawData)
+          resolve(body)
+        })
+      });
 
-//       res.setEncoding('utf8');
-//       let rawData = '';
-//       res.on('data', (chunk) => { rawData += chunk; });
-//       res.on('end', () => {
-//         try {
-//           const parsedData = JSON.parse(rawData);
-//           resolve(parsedData)
-//           // console.log(parsedData);
-//         } catch (e) {
-//           reject(e.message)
-//           // console.error(e.message);
-//         }
-//       });
-//     }).on('error', (e) => {
-//       reject(e.message)
-//       // console.error(`Got error: ${e.message}`);
-//     });
-//   })
-// }
+      req.on('error', function(e) {
+        reject(e.message)
+      });
+    }catch(e){
+      reject(e.message)
+    }
+  })
+}
 
-// const getAppConfigDataRoot = async() => {
-//   ipcAppConfig = await getAppConfigData()
-// }
-// getAppConfigDataRoot();
 
 ipcConfig.loggerProviderProperties.filePath = ipcConfig.loggerProviderProperties.filePath? ipcConfig.loggerProviderProperties.filePath : desktopDir
 
-const ipcLogger : Logger = loggerFactory(ipcConfig)
 ipcLogger.info("Desktop directory path is " + desktopDir)
 const args = process.argv.slice(2)
 if( !args || args.length === 0) {
@@ -80,12 +60,7 @@ const cmdArgs: cliArgs = {command: args[0]  ? args[0] : 'start' };
 
 ipcLogger.info(`invoking cliExecuteCommand with ${cmdArgs.command}`)
 
-cliExecuteCommand(cmdArgs,ipcLogger,ipcAppConfig).then((code: number | void ) => {
-  ipcLogger.info(`cliExecuteCommand completed with return code : ${code}`)
-}).catch((err: Error)  => {
-  ipcLogger.info(`cliExecuteCommand completed with error : ${err.toString()}`)
-  process.exit();
-})
+
 
 process.on('exit', function() {
 
@@ -113,6 +88,31 @@ process.on('SIGHUP',() => {
   ipcLogger.error({message : "ETP_IPCHost is exiting", cb: ()=> {
     process.exit();
   }})
+})
+
+const getAppConfigDataRoot = async() => {
+  ipcLogger.log("getAppConfigDataRoot ")
+  ipcAppConfig = await getAppConfigData()
+  if(ipcAppConfig && ipcAppConfig.length) {
+    cliExecuteCommand(cmdArgs,ipcLogger,ipcAppConfig).then((code: number | void ) => {
+      ipcLogger.info(`cliExecuteCommand completed with return code : ${code}`)
+    }).catch((err: Error)  => {
+      ipcLogger.info(`cliExecuteCommand completed with error : ${err.toString()}`)
+      process.exit();
+    })
+  }
+  ipcLogger.log("getAppConfigDataRoot " + JSON.stringify(ipcAppConfig))
+}
+ipcLogger.log("getAppConfigDataRoot 11")
+
+// getAppConfigDataRoot();
+
+
+cliExecuteCommand(cmdArgs,ipcLogger,ipcAppConfig).then((code: number | void ) => {
+  ipcLogger.info(`cliExecuteCommand completed with return code : ${code}`)
+}).catch((err: Error)  => {
+  ipcLogger.info(`cliExecuteCommand completed with error : ${err.toString()}`)
+  process.exit();
 })
 
 

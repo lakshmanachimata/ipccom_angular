@@ -54,7 +54,7 @@ export class IPCHost  {
   constructor(logger : Logger, ipcAppConfig :  ClientApp[]) {
     this.logger = logger
     this.ipcAppConfig = ipcAppConfig
-    logger.info(" CLient app json is " + JSON.stringify(this.ipcAppConfig))
+    // logger.info(" CLient app json is " + JSON.stringify(this.ipcAppConfig))
     this.validateAppConfig();
     // const cwd  = process.env.ipcCWD | process.cwd();
     //this.ipcHost = new WebSocet.Server({port : this.default_ipc_port, path: this.etpipchostpath })
