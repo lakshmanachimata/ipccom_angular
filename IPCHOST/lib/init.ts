@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os'; // See: https://www.npmjs.com/package/os
 import { Logger, loggerFactory } from '../src/ipc-logger';
 import { cliExecuteCommand, cliArgs } from './cli';
 const IPCCLILOGGERFILE = 'ETP-IPCCLI-Logger';
@@ -11,7 +12,14 @@ if(!ipcConfig) {
   process.exit(1)
 }
 
+const homeDir = os.homedir()
+const desktopDir = `${homeDir}/Desktop`;
+
+
+ipcConfig.loggerProviderProperties.filePath = ipcConfig.loggerProviderProperties.filePath? ipcConfig.loggerProviderProperties.filePath : desktopDir
+
 const ipcLogger : Logger = loggerFactory(ipcConfig)
+ipcLogger.info("Desktop directory path is " + desktopDir)
 const args = process.argv.slice(2)
 if( !args || args.length == 0) {
   ipcLogger.info('IPC Cli is invoked without any parameters. It is going to run with start as default command')

@@ -6,7 +6,7 @@
   "logData":true,
   "loggerProviderProperties": {
     "fileMaxSize": "10MB",
-    "filePath": "c:\\Users\\nbdrgzq",
+    "filePath": "",
     "fileName": "ETP-IPCHost-Logger"
   }
 }
