@@ -6,6 +6,13 @@ import { IncomingMessage } from 'http'
 // import * as https from 'https'
 import * as http from 'http'
 import * as url from 'url'
+import { ClientApp } from './clientapp'
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os'; // See: https://www.npmjs.com/package/os
+const cwd = process.env.ipcCWD || process.cwd()
+
+const appConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/providers.json'), 'utf-8'))
 
 //type of application Information
 type appInfo = { connId : string, appName : string}
@@ -42,8 +49,12 @@ export class IPCHost  {
   private newConnId = 0;
   private server: any;
 
+  private clientApps : ClientApp[] = appConfig
+
   constructor(logger : Logger ) {
     this.logger = logger
+    // logger.info(" CLient app json is " + JSON.stringify(this.clientApps))
+    this.validateAppConfig();
     // const cwd  = process.env.ipcCWD | process.cwd();
     //this.ipcHost = new WebSocet.Server({port : this.default_ipc_port, path: this.etpipchostpath })
     //Mamascomment//const key = fs.readFileAsync(path.resolve(cwd, '../configuration/etpipchopstkey.pem'))
@@ -54,6 +65,7 @@ export class IPCHost  {
     this.server.listen(this.ipcHostPort);
     this.log("IPC - new instance created", logType.info)
   }
+
   //public methods
   /**
    * Set IPCHost to listen to connection, message and close request from clients
@@ -125,6 +137,12 @@ export class IPCHost  {
    * Generic message handler
    * Route messages to specific handlers
    */
+
+  private validateAppConfig(): boolean {
+    let valid : boolean = false
+
+    return valid
+  }
   private handleMessage(ws : WebSocket , message : any) {
     // validate incoming message for proper structure
     const parsedMsg = this.parseMessage(message);

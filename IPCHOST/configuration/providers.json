@@ -1,0 +1,40 @@
+[
+  {
+    "provider": "app1",
+    "events": [
+      {
+        "eventname": "ev1",
+        "subsribers": [
+          "sub1",
+          "sub2",
+          "sub3"
+        ]
+      },
+      {
+        "eventname": "ev2",
+        "subsribers": [
+          "sub4"
+        ]
+      }
+    ]
+  },
+  {
+    "provider": "app2",
+    "events": [
+      {
+        "eventname": "ev3",
+        "subsribers": [
+          "sub5",
+          "sub6"
+        ]
+      },
+      {
+        "eventname": "ev4",
+        "subsribers": [
+          "sub7",
+          "sub8"
+        ]
+      }
+    ]
+  }
+]
