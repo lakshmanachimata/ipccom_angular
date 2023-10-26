@@ -90,8 +90,9 @@ export class ConsoleLogger extends LoggerBase {
     try {
       super(logLevel,logData);
       this.subscription = this._subject.subscribe((entry : LogEntry) => {
+        const dateAndTime = new Date().toLocaleString('en-US',{year : 'numeric', month : 'numeric', day : 'numeric', hour : 'numeric', minute : 'numeric', second : 'numeric'})
         let console = process.stdout;
-        console.write(entry.message + '\n')
+        console.write(dateAndTime + '\t' + entry.message + '\n')
         if(entry.cb && typeof(entry.cb) === 'function') entry.cb()
       })
     }catch(e) {
