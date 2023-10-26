@@ -49,11 +49,12 @@ export class IPCHost  {
   private newConnId = 0;
   private server: any;
 
-  private clientApps : ClientApp[] = appConfig
+  private ipcAppConfig : ClientApp[] = appConfig
 
-  constructor(logger : Logger ) {
+  constructor(logger : Logger, ipcAppConfig :  ClientApp[]) {
     this.logger = logger
-    // logger.info(" CLient app json is " + JSON.stringify(this.clientApps))
+    this.ipcAppConfig = ipcAppConfig
+    logger.info(" CLient app json is " + JSON.stringify(this.ipcAppConfig))
     this.validateAppConfig();
     // const cwd  = process.env.ipcCWD | process.cwd();
     //this.ipcHost = new WebSocet.Server({port : this.default_ipc_port, path: this.etpipchostpath })
