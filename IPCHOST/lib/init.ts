@@ -9,43 +9,52 @@ const IPCCLILOGGERFILE = 'ETP-IPCCLI-Logger';
 const cwd = process.env.ipcCWD || process.cwd()
 const ipcConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/ipc.json'), 'utf-8'))
 let ipcAppConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/providers.json'), 'utf-8'))
+const homeDir = os.homedir()
+const desktopDir = `${homeDir}/Desktop`;
+const ipcLogger : Logger = loggerFactory(ipcConfig)
 
 if(!ipcConfig) {
   console.error('ETP IPC Host confiuration missing. Unable to start')
   process.exit(1)
 }
 
-const homeDir = os.homedir()
-const desktopDir = `${homeDir}/Desktop`;
-
-
-const ipcLogger : Logger = loggerFactory(ipcConfig)
-
 const getAppConfigData = async() => {
-  return new Promise((resolve, reject) => {
-    try {
-      var options = {
-        host: 'localhost',
-        port:4000,
-        path: ''
-      };
-      var req = http.get(options, function(res) {
-        let rawData = '';
-        res.on('data', function(chunk) {
-          rawData += chunk;
-        }).on('end', function() {
-          var body = JSON.parse(rawData)
-          resolve(body)
-        })
-      });
+  if(ipcConfig.loadFromLocal) {
+    return new Promise((resolve, reject) => {
+      ipcAppConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/providers.json'), 'utf-8'))
+      if(ipcAppConfig){
+        resolve(ipcAppConfig)
+      }else{
+        reject([])
+      }
+    });
+  }else {
+    return new Promise((resolve, reject) => {
+      try {
+        var options = {
+          host: 'localhost',
+          port:4000,
+          path: ''
+        };
+        var req = http.get(options, function(res) {
+          let rawData = '';
+          res.on('data', function(chunk) {
+            rawData += chunk;
+          }).on('end', function() {
+            var body = JSON.parse(rawData)
+            resolve(body)
+          })
+        });
 
-      req.on('error', function(e) {
+        req.on('error', function(e) {
+          reject(e.message)
+        });
+      }catch(e){
         reject(e.message)
-      });
-    }catch(e){
-      reject(e.message)
-    }
-  })
+      }
+    })
+  }
+
 }
 
 
@@ -59,8 +68,6 @@ if( !args || args.length === 0) {
 const cmdArgs: cliArgs = {command: args[0]  ? args[0] : 'start' };
 
 ipcLogger.info(`invoking cliExecuteCommand with ${cmdArgs.command}`)
-
-
 
 process.on('exit', function() {
 
@@ -90,10 +97,19 @@ process.on('SIGHUP',() => {
   }})
 })
 
+const validateAppConfig = () =>
+{
+  if(!ipcAppConfig || !ipcAppConfig.length) {
+    return false;
+  }
+  return true;
+}
+
 const getAppConfigDataRoot = async() => {
   ipcLogger.log("getAppConfigDataRoot ")
   ipcAppConfig = await getAppConfigData()
-  if(ipcAppConfig && ipcAppConfig.length) {
+  if( validateAppConfig()) {
+    ipcLogger.log("getAppConfigDataRoot " + JSON.stringify(ipcAppConfig))
     cliExecuteCommand(cmdArgs,ipcLogger,ipcAppConfig).then((code: number | void ) => {
       ipcLogger.info(`cliExecuteCommand completed with return code : ${code}`)
     }).catch((err: Error)  => {
@@ -101,19 +117,11 @@ const getAppConfigDataRoot = async() => {
       process.exit();
     })
   }
-  ipcLogger.log("getAppConfigDataRoot " + JSON.stringify(ipcAppConfig))
 }
 ipcLogger.log("getAppConfigDataRoot 11")
 
-// getAppConfigDataRoot();
+getAppConfigDataRoot();
 
-
-cliExecuteCommand(cmdArgs,ipcLogger,ipcAppConfig).then((code: number | void ) => {
-  ipcLogger.info(`cliExecuteCommand completed with return code : ${code}`)
-}).catch((err: Error)  => {
-  ipcLogger.info(`cliExecuteCommand completed with error : ${err.toString()}`)
-  process.exit();
-})
 
 
 
