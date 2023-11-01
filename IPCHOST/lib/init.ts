@@ -92,10 +92,13 @@ process.on('SIGHUP',() => {
     process.exit();
   }})
 })
-
-const validateAppConfig = (ipcConfigData) =>
+/**
+ * primary validation of json will be done here
+ * @param appConfig
+ * @returns
+ */
+const validateAppConfig = (appConfig): boolean =>
 {
-  const appConfig = ipcConfigData && ipcConfigData.length ? ipcConfigData : ipcAppConfig
   if(!appConfig) {
     return false;
   }
@@ -103,12 +106,10 @@ const validateAppConfig = (ipcConfigData) =>
 }
 
 const getAppConfig = async() => {
-  const ipcConfigData : any  = await getAppConfigData()
-  function returnAppConfig() : any {
-    return ipcConfigData && ipcConfigData.length ? ipcConfigData : ipcAppConfig
-  }
-  if( validateAppConfig(ipcConfigData)) {
-    cliExecuteCommand(cmdArgs,ipcLogger,returnAppConfig()).then((code: number | void ) => {
+  const appConfigData : any  = await getAppConfigData()
+  const appConfig =  (appConfigData && appConfigData.length) ? appConfigData : ipcAppConfig
+  if( validateAppConfig(appConfig)) {
+    cliExecuteCommand(cmdArgs,ipcLogger,appConfig).then((code: number | void ) => {
       ipcLogger.info(`cliExecuteCommand completed with return code : ${code}`)
     }).catch((err: Error)  => {
       ipcLogger.info(`cliExecuteCommand completed with error : ${err.toString()}`)
