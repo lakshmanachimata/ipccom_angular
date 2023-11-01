@@ -19,11 +19,7 @@ if(!ipcConfig) {
 }
 
 const getAppConfigData = async() => {
-  if(ipcConfig.loadFromLocal) {
-    return new Promise((resolve, reject) => {
-      resolve(ipcAppConfig)
-    });
-  }else {
+  if(ipcConfig.appConfig == "remote") {
     return new Promise((resolve, reject) => {
       try {
         var options = {
@@ -50,8 +46,11 @@ const getAppConfigData = async() => {
         resolve([])
       }
     })
+  }else {
+    return new Promise((resolve, reject) => {
+      resolve(ipcAppConfig)
+    });
   }
-
 }
 
 

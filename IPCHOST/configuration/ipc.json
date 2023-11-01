@@ -4,7 +4,7 @@
   "logLevel":"info",
   "loggerProvider":"console",
   "logData":true,
-  "loadFromLocal" : true,
+  "appConfig" : "local",
   "loggerProviderProperties": {
     "fileMaxSize": "10MB",
     "filePath": "",
