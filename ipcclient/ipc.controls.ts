@@ -32,7 +32,7 @@ export class IpcControlImpl implements IpcControl {
       this.ws.onerror = (e : WebSocket.ErrorEvent) => this.onError(e);
       this.ws.onmessage = (m : WebSocket.MessageEvent) => this.onMessage(m);
       this.ws.onclose = () => { this.reset(); if(!this.isDisposed) { setTimeout(() => this.init() ,200)}}
-      this.ws.onerror = (e : WebSocket.Event) => this.onOpen(e);
+      this.ws.onopen = (e : WebSocket.Event) => this.onOpen(e);
   }
 
   getWS(): WebSocket {
@@ -82,6 +82,7 @@ export class IpcControlImpl implements IpcControl {
     this.appName = appName;
     let sa = appName.split(';')
     if(this.appInitialized == false) {
+      console.log(`initialize called with ${appName}`)
       const data = {clientSessionId : sa.length > 1 ? sa[1] : null};
       this.send('initialize', sa[0], sa.length > 1 ? data : null);
       this.appInitialized = true
