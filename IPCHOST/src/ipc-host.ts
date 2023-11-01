@@ -233,11 +233,26 @@ private wsEmit(ws: WebSocket, type: evnetType, key: string, data: any,  targetCl
       key:key,
       data: data
     }));
-    this.log(`Message sent to ${targetClientInfo.appName} / Client id: ${targetClientInfo.connId}/ session id: ${targetClientInfo.clientSessionId}`, logType.info);
+    if(targetClientInfo)
+      this.log(`Message sent to ${targetClientInfo.appName} / Client id: ${targetClientInfo.connId}/ session id: ${targetClientInfo.clientSessionId}`, logType.info);
     this.dumpData({type : type, key:key ,data :data})
   }else {
-    this.log(`This client socket state is not ready state. ${targetClientInfo.appName} / Client id: ${targetClientInfo.connId}/ session id: ${targetClientInfo.clientSessionId} / socket state ${ws.readyState}`, logType.error)
+    if(targetClientInfo)
+      this.log(`This client socket state is not ready state. ${targetClientInfo.appName} / Client id: ${targetClientInfo.connId}/ session id: ${targetClientInfo.clientSessionId} / socket state ${ws.readyState}`, logType.error)
   }
+}
+
+private checkIfAppNameAllowed(appName: string): boolean {
+  if(this.ipcAppConfig.length) {
+    for(let  ai = 0; ai < this.ipcAppConfig.length; ai++) {
+      if(appName == this.ipcAppConfig[ai].provider){
+        return true;
+      }
+    }
+  }else {
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -256,6 +271,15 @@ private handleInitialize(ws: WebSocket, data:any) {
     return ws.close();
   }
   const appName = data.key? data.key.split(';')[0] : data.key;
+  if(this.checkIfAppNameAllowed(appName) == false) {
+    this.log(`App name is not allowed  ${appName}`, logType.error)
+    const message = 'Client is attempting to initialize non-allowed application name. socket will be closed';
+    const response = Object.assign({},{
+      success: false, duplicate: false, message: message
+    });
+    this.wsEmit(ws, evnetType.initializeResponse,(data && data.key) ? data.key : 'Application name is not allowed', response, null);
+    return ws.close();
+  }
   const clientInfo = this.socketStore.get(ws);
   if(clientInfo) {
     clientInfo.clientSessionId = (data.data && data.data.clientSessionId && data.data.clientSessionId !== '' && (!data.data.clientSessionId.includes("undefined"))) ? data.data.clientSessionId : null;
