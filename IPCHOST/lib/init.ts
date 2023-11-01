@@ -93,7 +93,7 @@ process.on('SIGHUP',() => {
   }})
 })
 /**
- * primary validation of json will be done here
+ * primary validation of json will be done here more can be added later
  * @param appConfig
  * @returns
  */
