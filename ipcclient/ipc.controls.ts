@@ -1,7 +1,8 @@
 import { Observable,Subject } from "rxjs";
 import { IpcControl,IpcEvent,DFContext,DFOptions,DFNavigatorQueryPair } from "./ipc.interface";
 import {filter, map} from 'rxjs/operators'
-import * as WebSocket from 'ws'
+// import * as WebSocket from 'ws'
+import WebSocket from 'ws';
 
 export class IpcControlImpl implements IpcControl {
   private contextSubject: Subject<IpcEvent> = new Subject<IpcEvent>();
@@ -9,7 +10,7 @@ export class IpcControlImpl implements IpcControl {
   private ws: WebSocket = null;
   private appName;
   private appInitialized = false;
-  private SERVER_URL = "ws://localhost:8000/etpipchost";
+  private SERVER_URL = "ws://localhost:8000";
   private isSocketOpen? : Promise<boolean>;
   private resolver: any = null;
   private isDisposed = false;
@@ -25,7 +26,7 @@ export class IpcControlImpl implements IpcControl {
         this.resolver = resolve
       })
       if(this.enableLocalHost) {
-        this.SERVER_URL = "ws://localhost:8000/etpipchost"
+        this.SERVER_URL = "ws://localhost:8000"
       }
       this.ws = new WebSocket(this.SERVER_URL);
       this.ws.onerror = (e : WebSocket.ErrorEvent) => this.onError(e);

@@ -11,8 +11,10 @@ const initApp = async() => {
   if(ipcCtrl.getWS()) {
     {
       setTimeout(() => {
-        if(ipcCtrl.getWS().readyState == WebSocket.OPEN){
+        if(ipcCtrl.getWS() && ipcCtrl.getWS().readyState == WebSocket.OPEN){
           console.log("initApp  Websocket opened " + ipcCtrl.getAppName())
+        }else {
+          console.log("WebSocket is not yet ready " + ipcCtrl.getAppName())
         }
     } ,1000)}
   }
