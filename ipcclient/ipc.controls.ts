@@ -49,6 +49,7 @@ export class IpcControlImpl implements IpcControl {
   }
   onOpen(e : WebSocket.Event) {
     this.resolver && this.resolver(true);
+    console.log(`onOpen called ${e.type}`)
     if(this.appName && !this.appInitialized) this.initialize(this.appName)
   }
   onMessage(m : WebSocket.MessageEvent) {

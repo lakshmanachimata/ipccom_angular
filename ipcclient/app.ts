@@ -7,7 +7,7 @@ import * as WebSocket from 'ws'
 const initApp = async() => {
   console.log("initApp  called")
   let ipcCtrl = new IpcControlImpl(true)
-  ipcCtrl.setAppName('app1;1111')
+  ipcCtrl.setAppName('app111;1111')
   if(ipcCtrl.getWS()) {
     {
       setTimeout(() => {
