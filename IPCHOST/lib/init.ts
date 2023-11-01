@@ -106,10 +106,8 @@ const validateAppConfig = () =>
 }
 
 const getAppConfigDataRoot = async() => {
-  ipcLogger.log("getAppConfigDataRoot ")
   ipcAppConfig = await getAppConfigData()
   if( validateAppConfig()) {
-    ipcLogger.log("getAppConfigDataRoot " + JSON.stringify(ipcAppConfig))
     cliExecuteCommand(cmdArgs,ipcLogger,ipcAppConfig).then((code: number | void ) => {
       ipcLogger.info(`cliExecuteCommand completed with return code : ${code}`)
     }).catch((err: Error)  => {
@@ -118,8 +116,6 @@ const getAppConfigDataRoot = async() => {
     })
   }
 }
-ipcLogger.log("getAppConfigDataRoot 11")
-
 getAppConfigDataRoot();
 
 

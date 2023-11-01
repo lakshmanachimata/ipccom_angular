@@ -2,7 +2,7 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2015",
     "module": "Commonjs",
     "lib": [
       "es2015",
