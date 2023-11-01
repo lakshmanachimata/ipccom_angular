@@ -102,9 +102,9 @@ const validateAppConfig = () =>
 }
 
 const getAppConfig = async() => {
-  const ipcConfig : any  = await getAppConfigData()
+  const ipcConfigData : any  = await getAppConfigData()
   function returnAppConfig() : any {
-    return ipcConfig && ipcConfig.length ? ipcConfig : ipcAppConfig
+    return ipcConfigData && ipcConfigData.length ? ipcConfigData : ipcAppConfig
   }
   if( validateAppConfig()) {
     cliExecuteCommand(cmdArgs,ipcLogger,returnAppConfig()).then((code: number | void ) => {
