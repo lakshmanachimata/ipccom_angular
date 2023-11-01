@@ -34,6 +34,15 @@ export class IpcControlImpl implements IpcControl {
       this.ws.onerror = (e : WebSocket.Event) => this.onOpen(e);
   }
 
+  getWS(): WebSocket {
+    return this.ws;
+  }
+  setAppName(appName: string): void {
+    this.appName = appName
+  }
+  getAppName(): string {
+    return this.appName
+  }
   onError(e : WebSocket.ErrorEvent) {
     this.reset();
   }
