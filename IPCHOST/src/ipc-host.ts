@@ -226,7 +226,7 @@ private wsEmitToUserSession(srcSessionId: string, targetClientInfo: any, ws: Web
 }
 
 private wsEmit(ws: WebSocket, type: evnetType, key: string, data: any,  targetClientInfo: any) {
-  if(ws.readState === 1) {
+  if(ws.readyState === WebSocket.OPEN) {
     // this.outputMsg('Msg to client ' + GetSocketInfo(ws) + ';' +  DataToString(type, key, data));
     ws.send(JSON.stringify({
       type: type,
@@ -236,7 +236,7 @@ private wsEmit(ws: WebSocket, type: evnetType, key: string, data: any,  targetCl
     this.log(`Message sent to ${targetClientInfo.appName} / Client id: ${targetClientInfo.connId}/ session id: ${targetClientInfo.clientSessionId}`, logType.info);
     this.dumpData({type : type, key:key ,data :data})
   }else {
-    this.log(`This client socket state is not ready state. ${targetClientInfo.appName} / Client id: ${targetClientInfo.connId}/ session id: ${targetClientInfo.clientSessionId}`, logType.error)
+    this.log(`This client socket state is not ready state. ${targetClientInfo.appName} / Client id: ${targetClientInfo.connId}/ session id: ${targetClientInfo.clientSessionId} / socket state ${ws.readyState}`, logType.error)
   }
 }
 
@@ -370,7 +370,10 @@ private handleInitialize(ws: WebSocket, data:any) {
   private validatePath(req: IncomingMessage): boolean {
     try {
         const urlObj = url.parse(req.url ? req.url : '')
-        const path = urlObj.path;
+        let path = urlObj.path;
+        if(path == "/") {
+          path = undefined
+        }
         if(path === this.ipcHost.path)
           return true;
         else
@@ -396,7 +399,7 @@ private handleInitialize(ws: WebSocket, data:any) {
       //connection from only localhost
       const onlyLocalHost = req.headers ? req.headers.host : null
       // if (onlyLocalHost !== `localhost${this.default_ipc_port}`)
-      if (onlyLocalHost !== `${this.ipcHostName}${this.ipcHostPort}` && onlyLocalHost !== `localhost${this.ipcHostPort}`) {
+      if (onlyLocalHost !== `${this.ipcHostName}${this.ipcHostPort}` && onlyLocalHost !== `localhost:${this.ipcHostPort}`) {
         this.log('An attempt to connect from network / or not using localhost. Closing the connection from this client', logType.error);
         this.dumpData(req.headers);
         return false;
