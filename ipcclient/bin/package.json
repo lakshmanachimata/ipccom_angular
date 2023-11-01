@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "http": "^0.0.1-security",
+    "https": "^1.0.0",
+    "rxjs": "^6.6.7",
+    "ws": "^5.2.3"
+  }
+}

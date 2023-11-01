@@ -10,7 +10,7 @@ export class IpcControlImpl implements IpcControl {
   private appName;
   private appInitialized = false;
   private SERVER_URL = "ws://localhost:8000/etpipchost";
-  private isSocketOpen: Promise<boolean> = null;
+  private isSocketOpen? : Promise<boolean>;
   private resolver: any = null;
   private isDisposed = false;
   private enableLocalHost: boolean;
@@ -28,20 +28,20 @@ export class IpcControlImpl implements IpcControl {
         this.SERVER_URL = "ws://localhost:8000/etpipchost"
       }
       this.ws = new WebSocket(this.SERVER_URL);
-      this.ws.onerror = (e : ErrorEvent) => this.onError(e);
-      this.ws.onmessage = (m : MessageEvent) => this.onMessage(m);
+      this.ws.onerror = (e : WebSocket.ErrorEvent) => this.onError(e);
+      this.ws.onmessage = (m : WebSocket.MessageEvent) => this.onMessage(m);
       this.ws.onclose = () => { this.reset(); if(!this.isDisposed) { setTimeout(() => this.init() ,200)}}
-      this.ws.onerror = (e : Event) => this.onOpen(e);
+      this.ws.onerror = (e : WebSocket.Event) => this.onOpen(e);
   }
 
-  onError(e : ErrorEvent) {
+  onError(e : WebSocket.ErrorEvent) {
     this.reset();
   }
-  onOpen(e : Event) {
+  onOpen(e : WebSocket.Event) {
     this.resolver && this.resolver(true);
     if(this.appName && !this.appInitialized) this.initialize(this.appName)
   }
-  onMessage(m : MessageEvent) {
+  onMessage(m : WebSocket.MessageEvent) {
     let msgData = JSON.parse(m.data);
     let eventType = msgData.type;
     let key = msgData.keyboard
@@ -80,8 +80,8 @@ export class IpcControlImpl implements IpcControl {
   publish(name: string , value : any ): void {
     this.send('publish',name, JSON.stringify(value))
   }
-  subscribe(name : string) {
-    let result = this.subcriptSubject.asObservable().pipe(filter((m: IpcEvent) =>  m.name === name )).pipe(map((m: IpcEvent) => m.value));
+  subscribe(name : string): Observable<any> {
+    return this.subcriptSubject.asObservable().pipe(filter((m: IpcEvent) =>  m.name === name )).pipe(map((m: IpcEvent) => m.value));
   }
   setContext(context: DFContext): void {
     this.send('set', context.key, JSON.stringify(context))
@@ -137,7 +137,7 @@ export class IpcControlImpl implements IpcControl {
   }
   private reset(): void {
     if(this.resolver) this.resolver(false);
-    this.isSocketOpen = null;
+    this.isSocketOpen = undefined;
     this.resolver = null;
     this.closeSocket()
   }

@@ -1,0 +1,33 @@
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "Commonjs",
+    "lib": [
+      "es2015",
+      "es2016",
+      "es2017"
+    ],
+    "outDir": "./bin",
+    "rootDir": ".",
+    "removeComments": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "moduleResolution": "node",
+    "stripInternal": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "types" :[
+      "node",
+      "jasmine"
+    ],
+    "esModuleInterop": true
+  },
+  "exclude": [
+    "spec"
+  ]
+}
