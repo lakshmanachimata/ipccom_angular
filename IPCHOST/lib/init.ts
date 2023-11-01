@@ -93,9 +93,10 @@ process.on('SIGHUP',() => {
   }})
 })
 
-const validateAppConfig = () =>
+const validateAppConfig = (ipcConfigData) =>
 {
-  if(!ipcAppConfig || !ipcAppConfig.length) {
+  const appConfig = ipcConfigData && ipcConfigData.length ? ipcConfigData : ipcAppConfig
+  if(!appConfig) {
     return false;
   }
   return true;
@@ -106,13 +107,15 @@ const getAppConfig = async() => {
   function returnAppConfig() : any {
     return ipcConfigData && ipcConfigData.length ? ipcConfigData : ipcAppConfig
   }
-  if( validateAppConfig()) {
+  if( validateAppConfig(ipcConfigData)) {
     cliExecuteCommand(cmdArgs,ipcLogger,returnAppConfig()).then((code: number | void ) => {
       ipcLogger.info(`cliExecuteCommand completed with return code : ${code}`)
     }).catch((err: Error)  => {
       ipcLogger.info(`cliExecuteCommand completed with error : ${err.toString()}`)
       process.exit();
     })
+  } else {
+    ipcLogger.info(`Invalid application config please correct application configuration`)
   }
 }
 getAppConfig();
