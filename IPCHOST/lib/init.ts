@@ -8,7 +8,7 @@ import { cliExecuteCommand, cliArgs } from './cli';
 const IPCCLILOGGERFILE = 'ETP-IPCCLI-Logger';
 const cwd = process.env.ipcCWD || process.cwd()
 const ipcConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/ipc.json'), 'utf-8'))
-let ipcAppConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/providers.json'), 'utf-8'))
+const ipcAppConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/providers.json'), 'utf-8'))
 const homeDir = os.homedir()
 const desktopDir = `${homeDir}/Desktop`;
 const ipcLogger : Logger = loggerFactory(ipcConfig)
@@ -21,12 +21,7 @@ if(!ipcConfig) {
 const getAppConfigData = async() => {
   if(ipcConfig.loadFromLocal) {
     return new Promise((resolve, reject) => {
-      ipcAppConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/providers.json'), 'utf-8'))
-      if(ipcAppConfig){
-        resolve(ipcAppConfig)
-      }else{
-        reject([])
-      }
+      resolve(ipcAppConfig)
     });
   }else {
     return new Promise((resolve, reject) => {
@@ -47,10 +42,12 @@ const getAppConfigData = async() => {
         });
 
         req.on('error', function(e) {
-          reject(e.message)
+          ipcLogger.error(`provider json loading from remote failed with error ${e.message}`)
+          resolve([])
         });
       }catch(e){
-        reject(e.message)
+        ipcLogger.error(`provider json loading from remote failed with error ${e.message}`)
+        resolve([])
       }
     })
   }
@@ -106,9 +103,12 @@ const validateAppConfig = () =>
 }
 
 const getAppConfigDataRoot = async() => {
-  ipcAppConfig = await getAppConfigData()
+  const ipcConfig : any  = await getAppConfigData()
+  function getAppConfig() : any {
+    return ipcConfig && ipcConfig.length ? ipcConfig : ipcAppConfig
+  }
   if( validateAppConfig()) {
-    cliExecuteCommand(cmdArgs,ipcLogger,ipcAppConfig).then((code: number | void ) => {
+    cliExecuteCommand(cmdArgs,ipcLogger,getAppConfig()).then((code: number | void ) => {
       ipcLogger.info(`cliExecuteCommand completed with return code : ${code}`)
     }).catch((err: Error)  => {
       ipcLogger.info(`cliExecuteCommand completed with error : ${err.toString()}`)
