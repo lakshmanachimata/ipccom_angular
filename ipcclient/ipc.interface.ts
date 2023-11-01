@@ -33,5 +33,5 @@ export interface IpcControl {
   setContext(context: DFContext): any;
 
   publish(eventName: string,eventData: string | Object): void;
-  subscibe(eventName: string): Observable<any>;
+  subscribe(eventName: string): Observable<any>;
 }
