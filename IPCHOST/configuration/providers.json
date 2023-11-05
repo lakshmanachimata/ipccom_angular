@@ -3,13 +3,13 @@
     "provider": "app1",
     "events": [
       {
-        "eventname": "get",
+        "eventname": "test1",
         "subsribers": [
           "app2",
           "app3"        ]
       },
       {
-        "eventname": "set",
+        "eventname": "test2",
         "subsribers": [
           "app2",
           "app3"

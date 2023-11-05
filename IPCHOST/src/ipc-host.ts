@@ -190,6 +190,16 @@ export class IPCHost  {
     }
     return false
   }
+  private validateEventConfigForTheAppInPublish(appName: string, eventName: string): boolean {
+    console.log(`validateEventConfigForTheAppInPublish with ${appName} and ${eventName}`)
+    const eventNames = this.getEventsOfAppName(appName)
+    console.log(`validateEventConfigForTheApp eventNames ${JSON.stringify(eventNames)}`)
+    if(!eventNames.length) return false;
+    for(let ei = 0;  ei < eventNames.length; ei++) {
+      if(eventName == eventNames[ei].eventname) return true
+    }
+    return false
+  }
   private handleMessage(ws : WebSocket , message : any) {
     // validate incoming message for proper structure
     const parsedMsg = this.parseMessage(message);
@@ -351,8 +361,9 @@ private handleInitialize(ws: WebSocket, data:any) {
     return
   }
   const clientInfo = this.socketStore.get(ws);
-  if(!this.validateEventConfigForTheApp(clientInfo.appName,'publish')) {
-    this.log(`Publishing Event is not allowed fot the app: ${clientInfo.appName}`,logType.info)
+  // if(!this.validateEventConfigForTheApp(clientInfo.appName,'publish')) {
+  if(!this.validateEventConfigForTheAppInPublish(clientInfo.appName,data.key)) {
+    this.log(`Publishing Event is not allowed fot the app: ${clientInfo.appName} with event ${data.key}`,logType.info)
     const message = 'Publishing Event is not allowed fot the app.';
     const response = Object.assign({},{
       success: false, duplicate: false, message: message
