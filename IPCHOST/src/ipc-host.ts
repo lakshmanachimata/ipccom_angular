@@ -352,7 +352,12 @@ private handleInitialize(ws: WebSocket, data:any) {
   }
   const clientInfo = this.socketStore.get(ws);
   if(!this.validateEventConfigForTheApp(clientInfo.appName,'publish')) {
-    this.log(`Set Context is not allowed fot the app: ${clientInfo.appName}`,logType.info)
+    this.log(`Publishing Event is not allowed fot the app: ${clientInfo.appName}`,logType.info)
+    const message = 'Publishing Event is not allowed fot the app.';
+    const response = Object.assign({},{
+      success: false, duplicate: false, message: message
+    });
+    this.wsEmit(ws, evnetType.publishedEvent,'Publishing Event is not allowed fot the app', response, null);
     return
   }
   this.broadcast(ws,evnetType.publishedEvent, data)
@@ -369,6 +374,11 @@ private handleInitialize(ws: WebSocket, data:any) {
     const clientInfo = this.socketStore.get(ws);
     if(!this.validateEventConfigForTheApp(clientInfo.appName,'set')) {
       this.log(`Set Context is not allowed fot the app: ${clientInfo.appName}`,logType.info)
+      const message = 'Set Context is not allowed fot the app.';
+      const response = Object.assign({},{
+        success: false, duplicate: false, message: message
+      });
+      this.wsEmit(ws, evnetType.contextChangeEvent,'Set Context is not allowed fot the app', response, null);
       return
     }
 
@@ -389,7 +399,12 @@ private handleInitialize(ws: WebSocket, data:any) {
     }
     const clientInfo = this.socketStore.get(ws);
     if(!this.validateEventConfigForTheApp(clientInfo.appName,'navigateTo')) {
-      this.log(`Set Context is not allowed fot the app: ${clientInfo.appName}`,logType.info)
+      this.log(`navigateTo Event is not allowed fot the app: ${clientInfo.appName}`,logType.info)
+      const message = 'navigateTo Event is not allowed fot the app.';
+      const response = Object.assign({},{
+        success: false, duplicate: false, message: message
+      });
+      this.wsEmit(ws, evnetType.navigateEvent,'navigateTo Event is not allowed fot the app', response, null);
       return
     }
     this.broadcast(ws, evnetType.navigateEvent, data)
@@ -400,7 +415,12 @@ private handleInitialize(ws: WebSocket, data:any) {
     }
     const clientInfo = this.socketStore.get(ws);
     if(!this.validateEventConfigForTheApp(clientInfo.appName,'get')) {
-      this.log(`Set Context is not allowed fot the app: ${clientInfo.appName}`,logType.info)
+      this.log(`getContext Event is not allowed fot the app: ${clientInfo.appName}`,logType.info)
+      const message = 'getContext Event is not allowed fot the app.';
+      const response = Object.assign({},{
+        success: false, duplicate: false, message: message
+      });
+      this.wsEmit(ws, evnetType.contextGetEvent,'getContext Event is not allowed fot the app', response, null);
       return
     }
     let currKey = {}
