@@ -1,7 +1,6 @@
 import { Observable,Subject } from "rxjs";
 import { IpcControl,IpcEvent,DFContext,DFOptions,DFNavigatorQueryPair } from "./ipc.interface";
 import {filter, map} from 'rxjs/operators'
-// import * as WebSocket from 'ws'
 import WebSocket from 'ws';
 
 export class IpcControlImpl implements IpcControl {
@@ -155,7 +154,7 @@ export class IpcControlImpl implements IpcControl {
   }
   private closeSocket(): void {
     let ws = this.ws;
-    if(ws && ws.readyState == WebSocket.OPEN){
+    if(ws && ws.readyState == 1){
       ws.close();
     }
     this.ws = null;
@@ -163,7 +162,7 @@ export class IpcControlImpl implements IpcControl {
   }
   private sentToServer(message): void {
     let ws = this.ws;
-    if(ws && ws.readyState == WebSocket.OPEN){
+    if(ws && ws.readyState == 1){
       ws.send(message);
     }else {
       console.error(`Error: Unable to send the message because socket wasn't ready. State was ${ws.readyState}`)

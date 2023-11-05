@@ -9,6 +9,7 @@
       "es2016",
       "es2017"
     ],
+    "strictPropertyInitialization":false,
     "outDir": "./bin",
     "rootDir": ".",
     "removeComments": true,

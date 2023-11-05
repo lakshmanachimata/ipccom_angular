@@ -24,5 +24,5 @@ module.exports = {
   mode : 'production',
   // externals : [nodeExternals()],
   // devtool : 'cheap-module-source-mape',
-  plugins : [new uglifyIt()]
+  // plugins : [new uglifyIt()]
 }
