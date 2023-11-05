@@ -3,17 +3,16 @@
     "provider": "app1",
     "events": [
       {
-        "eventname": "ev1",
+        "eventname": "get",
         "subsribers": [
-          "sub1",
-          "sub2",
-          "sub3"
-        ]
+          "app2",
+          "app3"        ]
       },
       {
-        "eventname": "ev2",
+        "eventname": "set",
         "subsribers": [
-          "sub4"
+          "app2",
+          "app3"
         ]
       }
     ]
@@ -22,18 +21,16 @@
     "provider": "app2",
     "events": [
       {
-        "eventname": "ev3",
+        "eventname": "get",
         "subsribers": [
-          "sub5",
-          "sub6"
+          "app1",
+          "app3"
         ]
       },
       {
-        "eventname": "ev3",
+        "eventname": "publish",
         "subsribers": [
-          "sub7",
-          "sub8"
-        ]
+          "app1"        ]
       },
       {
         "eventname": "ev4",

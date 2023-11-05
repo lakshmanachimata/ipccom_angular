@@ -6,7 +6,7 @@ import { IncomingMessage } from 'http'
 // import * as https from 'https'
 import * as http from 'http'
 import * as url from 'url'
-import { ClientApp } from './clientapp'
+import { ClientApp, Event } from './clientapp'
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os'; // See: https://www.npmjs.com/package/os
@@ -28,7 +28,7 @@ const enum evnetType {
   contextChangeEvent = 'contextChange',
   publishedEvent = 'publishedEvent',
   navigateEvent = 'navigateEvent',
-  contextGetEvent = 'contextGetEvent',
+  contextGetEvent = 'getValueReturn',
   initializeResponse = 'initializeResponse'
 }
 
@@ -170,6 +170,25 @@ export class IPCHost  {
       }
     }
    return valid
+  }
+
+  private getEventsOfAppName(appName: string): Event[] {
+    for(let  ai = 0; ai < this.ipcAppConfig.length; ai++) {
+      if(this.ipcAppConfig[ai].provider == appName) {
+        return this.ipcAppConfig[ai].events
+      }
+    }
+    return []
+  }
+  private validateEventConfigForTheApp(appName: string, eventName: string): boolean {
+    console.log(`validateEventConfigForTheApp with ${appName} and ${eventName}`)
+    const eventNames = this.getEventsOfAppName(appName)
+    // console.log(`validateEventConfigForTheApp eventNames ${JSON.stringify(eventNames)}`)
+    if(!eventNames.length) return false;
+    for(let ei = 0;  ei < eventNames.length; ei++) {
+      if(eventName == eventNames[ei].eventname) return true
+    }
+    return false
   }
   private handleMessage(ws : WebSocket , message : any) {
     // validate incoming message for proper structure
@@ -331,6 +350,11 @@ private handleInitialize(ws: WebSocket, data:any) {
   if(!this.isClientInitialized(ws)) {
     return
   }
+  const clientInfo = this.socketStore.get(ws);
+  if(!this.validateEventConfigForTheApp(clientInfo.appName,'publish')) {
+    this.log(`Set Context is not allowed fot the app: ${clientInfo.appName}`,logType.info)
+    return
+  }
   this.broadcast(ws,evnetType.publishedEvent, data)
  }
 
@@ -341,7 +365,13 @@ private handleInitialize(ws: WebSocket, data:any) {
     if(!this.isClientInitialized(ws)) {
       return
     }
+
     const clientInfo = this.socketStore.get(ws);
+    if(!this.validateEventConfigForTheApp(clientInfo.appName,'set')) {
+      this.log(`Set Context is not allowed fot the app: ${clientInfo.appName}`,logType.info)
+      return
+    }
+
     let key: Object = {
       clientId: clientInfo.clientSessionId,
       contextKey: data.key
@@ -357,6 +387,11 @@ private handleInitialize(ws: WebSocket, data:any) {
     if(!this.isClientInitialized(ws)) {
       return
     }
+    const clientInfo = this.socketStore.get(ws);
+    if(!this.validateEventConfigForTheApp(clientInfo.appName,'navigateTo')) {
+      this.log(`Set Context is not allowed fot the app: ${clientInfo.appName}`,logType.info)
+      return
+    }
     this.broadcast(ws, evnetType.navigateEvent, data)
   }
   private handleGetContext(ws:WebSocket, data:any) {
@@ -364,6 +399,10 @@ private handleInitialize(ws: WebSocket, data:any) {
       return
     }
     const clientInfo = this.socketStore.get(ws);
+    if(!this.validateEventConfigForTheApp(clientInfo.appName,'get')) {
+      this.log(`Set Context is not allowed fot the app: ${clientInfo.appName}`,logType.info)
+      return
+    }
     let currKey = {}
     if(data.key && data.key != "") {
       this.log(`Retrieving context data for ${data.key}`, logType.info);
