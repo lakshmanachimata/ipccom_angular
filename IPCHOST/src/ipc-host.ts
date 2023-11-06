@@ -363,7 +363,8 @@ private handleInitialize(ws: WebSocket, data:any) {
   const clientInfo = this.socketStore.get(ws);
   // if(!this.validateEventConfigForTheApp(clientInfo.appName,'publish')) {
   if(!this.validateEventConfigForTheAppInPublish(clientInfo.appName,data.key)) {
-    this.log(`Publishing Event is not allowed fot the app: ${clientInfo.appName} with event ${data.key}`,logType.info)
+    // this.log(`Publishing Event is not allowed fot the app: ${clientInfo.appName}`,logType.info)
+    this.log(`Publishing of event ${data.key} is not allowed fot the app: ${clientInfo.appName} `,logType.info)
     const message = 'Publishing Event is not allowed fot the app.';
     const response = Object.assign({},{
       success: false, duplicate: false, message: message
