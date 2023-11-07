@@ -145,6 +145,19 @@ export class IPCHost  {
   //   }
   // }
 
+  private getSubscribersOfAppEvent(appName: string , eventName): String[] {
+    for(let  ai = 0; ai < this.ipcAppConfig.length; ai++) {
+      if(this.ipcAppConfig[ai].provider == appName) {
+        for(let ei = 0; ei < this.ipcAppConfig[ai].events.length; ei++){
+          if (this.ipcAppConfig[ai].events[ei].eventname === eventName){
+            return this.ipcAppConfig[ai].events[ei].subsribers
+          }
+        }
+      }
+    }
+    return []
+  }
+
   private getEventsOfAppName(appName: string): Event[] {
     for(let  ai = 0; ai < this.ipcAppConfig.length; ai++) {
       if(this.ipcAppConfig[ai].provider == appName) {
@@ -211,10 +224,15 @@ private broadcast(srcWs: WebSocket, type: evnetType, data:any) {
   const sessionId = (clientInfo.clientSessionId === null || clientInfo.clientSessionId === '' || typeof (clientInfo.clientSessionId) === 'undefined') ? null : clientInfo.clientSessionId
   this.log(`Message received from App name: ${clientInfo.appName} / Client id ${clientInfo.connId} / session id : ${sessionId} / message type ${data.type} /key : ${data.key}`, logType.info )
   this.dumpData({fromApp : clientInfo.appName, data :data})
+  let subScribers = this.getSubscribersOfAppEvent(clientInfo.appName, 'publish')
   this.socketStore.forEach((targetClientInfo , targetSocket , mape) => {
     //Do not broadcast to origination socket ** this check to be there until we have configuration support like in DF
     if(targetSocket === srcWs)
       return
+    if(!subScribers.includes(targetClientInfo.appName)){
+      this.log(`The appName ${targetClientInfo.appName} not allowed for subscribing to the app ${clientInfo.appName} for publish event`, logType.info)
+      return
+    }
     if(sessionId)
       this.wsEmitToUserSession(sessionId,targetClientInfo,targetSocket, type, data)
     else if (targetClientInfo.clientSessionId === null)

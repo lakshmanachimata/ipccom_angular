@@ -3,9 +3,9 @@
     "provider": "app1",
     "events": [
       {
-        "eventname": "test1",
+        "eventname": "publish",
         "subsribers": [
-          "app2",
+          "app4",
           "app3"
         ]
       },
