@@ -153,26 +153,26 @@ export class IPCHost  {
     }
     return []
   }
-  private validateEventConfigForTheApp(appName: string, eventName: string): boolean {
-    console.log(`validateEventConfigForTheApp with ${appName} and ${eventName}`)
-    const eventNames = this.getEventsOfAppName(appName)
-    // console.log(`validateEventConfigForTheApp eventNames ${JSON.stringify(eventNames)}`)
-    if(!eventNames.length) return false;
-    for(let ei = 0;  ei < eventNames.length; ei++) {
-      if(eventName == eventNames[ei].eventname) return true
-    }
-    return false
-  }
-  private validateEventConfigForTheAppInPublish(appName: string, eventName: string): boolean {
-    console.log(`validateEventConfigForTheAppInPublish with ${appName} and ${eventName}`)
-    const eventNames = this.getEventsOfAppName(appName)
-    console.log(`validateEventConfigForTheApp eventNames ${JSON.stringify(eventNames)}`)
-    if(!eventNames.length) return false;
-    for(let ei = 0;  ei < eventNames.length; ei++) {
-      if(eventName == eventNames[ei].eventname) return true
-    }
-    return false
-  }
+  // private validateEventConfigForTheApp(appName: string, eventName: string): boolean {
+  //   console.log(`validateEventConfigForTheApp with ${appName} and ${eventName}`)
+  //   const eventNames = this.getEventsOfAppName(appName)
+  //   // console.log(`validateEventConfigForTheApp eventNames ${JSON.stringify(eventNames)}`)
+  //   if(!eventNames.length) return false;
+  //   for(let ei = 0;  ei < eventNames.length; ei++) {
+  //     if(eventName == eventNames[ei].eventname) return true
+  //   }
+  //   return false
+  // }
+  // private validateEventConfigForTheAppInPublish(appName: string, eventName: string): boolean {
+  //   console.log(`validateEventConfigForTheAppInPublish with ${appName} and ${eventName}`)
+  //   const eventNames = this.getEventsOfAppName(appName)
+  //   console.log(`validateEventConfigForTheApp eventNames ${JSON.stringify(eventNames)}`)
+  //   if(!eventNames.length) return false;
+  //   for(let ei = 0;  ei < eventNames.length; ei++) {
+  //     if(eventName == eventNames[ei].eventname) return true
+  //   }
+  //   return false
+  // }
   private handleMessage(ws : WebSocket , message : any) {
     // validate incoming message for proper structure
     const parsedMsg = this.parseMessage(message);
@@ -333,18 +333,6 @@ private handleInitialize(ws: WebSocket, data:any) {
   if(!this.isClientInitialized(ws)) {
     return
   }
-  const clientInfo = this.socketStore.get(ws);
-  // if(!this.validateEventConfigForTheApp(clientInfo.appName,'publish')) {
-  if(!this.validateEventConfigForTheAppInPublish(clientInfo.appName,data.key)) {
-    // this.log(`Publishing Event is not allowed fot the app: ${clientInfo.appName}`,logType.info)
-    this.log(`Publishing of event ${data.key} is not allowed fot the app: ${clientInfo.appName} `,logType.info)
-    const message = 'Publishing Event is not allowed fot the app.';
-    const response = Object.assign({},{
-      success: false, duplicate: false, message: message
-    });
-    this.wsEmit(ws, evnetType.publishedEvent,'Publishing Event is not allowed fot the app', response, null);
-    return
-  }
   this.broadcast(ws,evnetType.publishedEvent, data)
  }
 
@@ -357,16 +345,6 @@ private handleInitialize(ws: WebSocket, data:any) {
     }
 
     const clientInfo = this.socketStore.get(ws);
-    if(!this.validateEventConfigForTheApp(clientInfo.appName,'set')) {
-      this.log(`Set Context is not allowed fot the app: ${clientInfo.appName}`,logType.info)
-      const message = 'Set Context is not allowed fot the app.';
-      const response = Object.assign({},{
-        success: false, duplicate: false, message: message
-      });
-      this.wsEmit(ws, evnetType.contextChangeEvent,'Set Context is not allowed fot the app', response, null);
-      return
-    }
-
     let key: Object = {
       clientId: clientInfo.clientSessionId,
       contextKey: data.key
@@ -382,16 +360,6 @@ private handleInitialize(ws: WebSocket, data:any) {
     if(!this.isClientInitialized(ws)) {
       return
     }
-    const clientInfo = this.socketStore.get(ws);
-    if(!this.validateEventConfigForTheApp(clientInfo.appName,'navigateTo')) {
-      this.log(`navigateTo Event is not allowed fot the app: ${clientInfo.appName}`,logType.info)
-      const message = 'navigateTo Event is not allowed fot the app.';
-      const response = Object.assign({},{
-        success: false, duplicate: false, message: message
-      });
-      this.wsEmit(ws, evnetType.navigateEvent,'navigateTo Event is not allowed fot the app', response, null);
-      return
-    }
     this.broadcast(ws, evnetType.navigateEvent, data)
   }
   private handleGetContext(ws:WebSocket, data:any) {
@@ -399,15 +367,6 @@ private handleInitialize(ws: WebSocket, data:any) {
       return
     }
     const clientInfo = this.socketStore.get(ws);
-    if(!this.validateEventConfigForTheApp(clientInfo.appName,'get')) {
-      this.log(`getContext Event is not allowed fot the app: ${clientInfo.appName}`,logType.info)
-      const message = 'getContext Event is not allowed fot the app.';
-      const response = Object.assign({},{
-        success: false, duplicate: false, message: message
-      });
-      this.wsEmit(ws, evnetType.contextGetEvent,'getContext Event is not allowed fot the app', response, null);
-      return
-    }
     let currKey = {}
     if(data.key && data.key != "") {
       this.log(`Retrieving context data for ${data.key}`, logType.info);
