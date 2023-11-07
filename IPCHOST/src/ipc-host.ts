@@ -55,7 +55,7 @@ export class IPCHost  {
     this.logger = logger
     this.ipcAppConfig = ipcAppConfig
     // logger.info(" CLient app json is " + JSON.stringify(this.ipcAppConfig))
-    this.validateAppConfig();
+    // this.validateAppConfig();
     // const cwd  = process.env.ipcCWD | process.cwd();
     //this.ipcHost = new WebSocet.Server({port : this.default_ipc_port, path: this.etpipchostpath })
     //Mamascomment//const key = fs.readFileAsync(path.resolve(cwd, '../configuration/etpipchopstkey.pem'))
@@ -139,38 +139,11 @@ export class IPCHost  {
    * Route messages to specific handlers
    */
 
-  private validateAppConfig(): boolean {
-    let valid : boolean = true
-    let appdups : any[] = [];
-    let eventdups : any[] = [];
-    if(this.ipcAppConfig.length) {
-      for(let  ai = 0; ai < this.ipcAppConfig.length; ai++) {
-        for(let aj = ai + 1; aj < this.ipcAppConfig.length; aj++) {
-          if(this.ipcAppConfig[ai].provider == this.ipcAppConfig[aj].provider) {
-            appdups.push({key : ai, value :  this.ipcAppConfig[ai].provider})
-          }
-        }
-        for(let  ei = 0; ei < this.ipcAppConfig[ai].events.length; ei++) {
-          for(let ej = ei + 1; ej < this.ipcAppConfig[ai].events.length; ej++) {
-            if(this.ipcAppConfig[ai].events[ei].eventname == this.ipcAppConfig[ai].events[ej].eventname) {
-              eventdups.push({key : ej, value : this.ipcAppConfig[ai].events[ej].eventname, app : this.ipcAppConfig[ai].provider})
-            }
-          }
-        }
-      }
-      if(eventdups.length) {
-        for (var eai = 0;  eai < eventdups.length; eai++ ) {
-          this.log(` duplicate provider ${eventdups[eai].value} found at position ${eventdups[eai].key+1}  for the ${eventdups[eai].app}` ,logType.info)
-        }
-      }
-      if(appdups.length) {
-        for (var dai = 0;  dai < appdups.length; dai++ ) {
-          this.log(` duplicate provider ${appdups[dai].value} found at position ${appdups[dai].key+1}  ` ,logType.info)
-        }
-      }
-    }
-   return valid
-  }
+  // private validateAppConfig(): boolean {
+  //   if(this.ipcAppConfig) {
+  //     return true
+  //   }
+  // }
 
   private getEventsOfAppName(appName: string): Event[] {
     for(let  ai = 0; ai < this.ipcAppConfig.length; ai++) {
