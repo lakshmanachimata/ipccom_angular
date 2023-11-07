@@ -163,16 +163,16 @@ export class IPCHost  {
   //   }
   //   return false
   // }
-  // private validateEventConfigForTheAppInPublish(appName: string, eventName: string): boolean {
-  //   console.log(`validateEventConfigForTheAppInPublish with ${appName} and ${eventName}`)
-  //   const eventNames = this.getEventsOfAppName(appName)
-  //   console.log(`validateEventConfigForTheApp eventNames ${JSON.stringify(eventNames)}`)
-  //   if(!eventNames.length) return false;
-  //   for(let ei = 0;  ei < eventNames.length; ei++) {
-  //     if(eventName == eventNames[ei].eventname) return true
-  //   }
-  //   return false
-  // }
+  private validateEventConfigForTheAppInPublish(appName: string, eventName: string): boolean {
+    console.log(`validateEventConfigForTheAppInPublish with ${appName} and ${eventName}`)
+    const eventNames = this.getEventsOfAppName(appName)
+    console.log(`validateEventConfigForTheApp eventNames ${JSON.stringify(eventNames)}`)
+    if(!eventNames.length) return false;
+    for(let ei = 0;  ei < eventNames.length; ei++) {
+      if(eventName == eventNames[ei].eventname) return true
+    }
+    return false
+  }
   private handleMessage(ws : WebSocket , message : any) {
     // validate incoming message for proper structure
     const parsedMsg = this.parseMessage(message);
