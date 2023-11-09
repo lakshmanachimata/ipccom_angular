@@ -6,13 +6,7 @@ import { IncomingMessage } from 'http'
 // import * as https from 'https'
 import * as http from 'http'
 import * as url from 'url'
-import { ClientApp, Event } from './clientapp'
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os'; // See: https://www.npmjs.com/package/os
-const cwd = process.env.ipcCWD || process.cwd()
-
-const appConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/providers.json'), 'utf-8'))
+import { Provider, ProviderValidator } from './ipc-provider'
 
 //type of application Information
 type appInfo = { connId : string, appName : string}
@@ -48,12 +42,13 @@ export class IPCHost  {
   private logger : Logger;
   private newConnId = 0;
   private server: any;
+  private providers : Provider[]
+  private providerValidator : ProviderValidator
 
-  private ipcAppConfig : ClientApp[] = appConfig
-
-  constructor(logger : Logger, ipcAppConfig :  ClientApp[]) {
+  constructor(logger : Logger, providers :  Provider[], providerValidator : ProviderValidator) {
     this.logger = logger
-    this.ipcAppConfig = ipcAppConfig
+    this.providers = providers;
+    this.providerValidator = providerValidator
     // logger.info(" CLient app json is " + JSON.stringify(this.ipcAppConfig))
     // this.validateAppConfig();
     // const cwd  = process.env.ipcCWD | process.cwd();
@@ -139,53 +134,6 @@ export class IPCHost  {
    * Route messages to specific handlers
    */
 
-  // private validateAppConfig(): boolean {
-  //   if(this.ipcAppConfig) {
-  //     return true
-  //   }
-  // }
-
-  private getSubscribersOfAppEvent(appName: string , eventName): String[] {
-    for(let  ai = 0; ai < this.ipcAppConfig.length; ai++) {
-      if(this.ipcAppConfig[ai].provider == appName) {
-        for(let ei = 0; ei < this.ipcAppConfig[ai].events.length; ei++){
-          if (this.ipcAppConfig[ai].events[ei].eventname === eventName){
-            return this.ipcAppConfig[ai].events[ei].subsribers
-          }
-        }
-      }
-    }
-    return []
-  }
-
-  private getEventsOfAppName(appName: string): Event[] {
-    for(let  ai = 0; ai < this.ipcAppConfig.length; ai++) {
-      if(this.ipcAppConfig[ai].provider == appName) {
-        return this.ipcAppConfig[ai].events
-      }
-    }
-    return []
-  }
-  // private validateEventConfigForTheApp(appName: string, eventName: string): boolean {
-  //   console.log(`validateEventConfigForTheApp with ${appName} and ${eventName}`)
-  //   const eventNames = this.getEventsOfAppName(appName)
-  //   // console.log(`validateEventConfigForTheApp eventNames ${JSON.stringify(eventNames)}`)
-  //   if(!eventNames.length) return false;
-  //   for(let ei = 0;  ei < eventNames.length; ei++) {
-  //     if(eventName == eventNames[ei].eventname) return true
-  //   }
-  //   return false
-  // }
-  private validateEventConfigForTheAppInPublish(appName: string, eventName: string): boolean {
-    console.log(`validateEventConfigForTheAppInPublish with ${appName} and ${eventName}`)
-    const eventNames = this.getEventsOfAppName(appName)
-    console.log(`validateEventConfigForTheApp eventNames ${JSON.stringify(eventNames)}`)
-    if(!eventNames.length) return false;
-    for(let ei = 0;  ei < eventNames.length; ei++) {
-      if(eventName == eventNames[ei].eventname) return true
-    }
-    return false
-  }
   private handleMessage(ws : WebSocket , message : any) {
     // validate incoming message for proper structure
     const parsedMsg = this.parseMessage(message);
@@ -224,7 +172,7 @@ private broadcast(srcWs: WebSocket, type: evnetType, data:any) {
   const sessionId = (clientInfo.clientSessionId === null || clientInfo.clientSessionId === '' || typeof (clientInfo.clientSessionId) === 'undefined') ? null : clientInfo.clientSessionId
   this.log(`Message received from App name: ${clientInfo.appName} / Client id ${clientInfo.connId} / session id : ${sessionId} / message type ${data.type} /key : ${data.key}`, logType.info )
   this.dumpData({fromApp : clientInfo.appName, data :data})
-  let subScribers = this.getSubscribersOfAppEvent(clientInfo.appName, 'publish')
+  let subScribers = this.providerValidator.getSubscribersOfAppEvent(this.providers,clientInfo.appName, 'publish')
   this.socketStore.forEach((targetClientInfo , targetSocket , mape) => {
     //Do not broadcast to origination socket ** this check to be there until we have configuration support like in DF
     if(targetSocket === srcWs)
@@ -262,18 +210,6 @@ private wsEmit(ws: WebSocket, type: evnetType, key: string, data: any,  targetCl
   }
 }
 
-private checkIfAppNameAllowed(appName: string): boolean {
-  if(this.ipcAppConfig.length) {
-    for(let  ai = 0; ai < this.ipcAppConfig.length; ai++) {
-      if(appName == this.ipcAppConfig[ai].provider){
-        return true;
-      }
-    }
-  }else {
-    return true;
-  }
-  return false;
-}
 
 /**
  * Handle Initialization message from clients
@@ -291,7 +227,7 @@ private handleInitialize(ws: WebSocket, data:any) {
     return ws.close();
   }
   const appName = data.key? data.key.split(';')[0] : data.key;
-  if(this.checkIfAppNameAllowed(appName) == false) {
+  if(this.providerValidator.checkIfAppNameAllowed(this.providers,appName) == false) {
     this.log(`App name is not allowed  ${appName}`, logType.error)
     const message = 'Client is attempting to initialize non-allowed application name. socket will be closed';
     const response = Object.assign({},{
