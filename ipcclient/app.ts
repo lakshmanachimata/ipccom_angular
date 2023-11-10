@@ -21,7 +21,7 @@ const initApp = async(cmgargs) => {
             let dfContext = new DFContextImpl()
             dfContext.key = 'ctxkey'
             dfContext.value = 'ctxval'
-            ipcCtrl.setContext(dfContext )
+            ipcCtrl.publish( 'test3', 'testval')
           }
           setTimeout(async () => {
             let ctxVal$ =  ipcCtrl.getContext('ctxkey')

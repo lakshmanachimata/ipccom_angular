@@ -13,7 +13,7 @@ interface IPCCliCommand {
   execute(): Promise<number>;
 }
 
-interface IPCCommandInterface<T1,T2> {
+interface IPCCommandInterface<T1,T2,T3> {
   new(T1,T2,T3) : IPCCliCommand;
 }
 
@@ -52,7 +52,7 @@ class IPCStartCommand implements IPCCliCommand {
  * AppLauncher cli command store
  */
 
-const commandStore = new Map<string, IPCCommandInterface<Logger, Provider[]>>();
+const commandStore = new Map<string, IPCCommandInterface<Logger, Provider[], ProviderValidator>>();
 commandStore.set('start', IPCStartCommand);
 commandStore.set('stop', IPCStopCommand);
 
@@ -66,7 +66,7 @@ export const cliExecuteCommand = async (options: cliArgs, logger: Logger, provid
   let retCode : number = 1
   if(options && options.command && (options.command !== '' || options.command !== undefined)){
     //pull a command
-    const cmd: IPCCommandInterface<Logger,Provider[]> = <IPCCommandInterface<Logger,Provider[] >>commandStore. get(options.command);
+    const cmd: IPCCommandInterface<Logger,Provider[],ProviderValidator> = <IPCCommandInterface<Logger,Provider[],ProviderValidator >>commandStore. get(options.command);
     //execute it
     retCode = cmd ? await new cmd(logger,providers,providerValidator).execute() : 1;
     if(retCode === 0) {
