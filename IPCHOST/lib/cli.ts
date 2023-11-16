@@ -1,4 +1,4 @@
-import { Provider, ProviderValidator } from './../src/ipc-provider';
+import { AppConfig, Provider, ProviderValidator } from './../src/ipc-provider';
 //const WebSocket = require('ws')
 import { IPCHost } from '../src/ipc-host'
 import { Logger } from '../src/ipc-logger'
@@ -39,8 +39,8 @@ class IPCStopCommand implements IPCCliCommand {
 
 class IPCStartCommand implements IPCCliCommand {
   private ipcHost : IPCHost;
-  constructor(logger : Logger, providers: Provider[],providerValidator : ProviderValidator) {
-    this.ipcHost = new IPCHost(logger,providers,providerValidator)
+  constructor(logger : Logger, appConfig: AppConfig,providerValidator : ProviderValidator) {
+    this.ipcHost = new IPCHost(logger,appConfig,providerValidator)
   }
   public async execute(): Promise<number> {
     const retCode = await this.ipcHost.start();
@@ -52,7 +52,7 @@ class IPCStartCommand implements IPCCliCommand {
  * AppLauncher cli command store
  */
 
-const commandStore = new Map<string, IPCCommandInterface<Logger, Provider[], ProviderValidator>>();
+const commandStore = new Map<string, IPCCommandInterface<Logger, AppConfig, ProviderValidator>>();
 commandStore.set('start', IPCStartCommand);
 commandStore.set('stop', IPCStopCommand);
 
@@ -62,13 +62,13 @@ commandStore.set('stop', IPCStopCommand);
  * @param logger type of Logger
  */
 
-export const cliExecuteCommand = async (options: cliArgs, logger: Logger, providers: Provider[] ,providerValidator : ProviderValidator): Promise<number> => {
+export const cliExecuteCommand = async (options: cliArgs, logger: Logger, appConfig: AppConfig ,providerValidator : ProviderValidator): Promise<number> => {
   let retCode : number = 1
   if(options && options.command && (options.command !== '' || options.command !== undefined)){
     //pull a command
     const cmd: IPCCommandInterface<Logger,Provider[],ProviderValidator> = <IPCCommandInterface<Logger,Provider[],ProviderValidator >>commandStore. get(options.command);
     //execute it
-    retCode = cmd ? await new cmd(logger,providers,providerValidator).execute() : 1;
+    retCode = cmd ? await new cmd(logger,appConfig,providerValidator).execute() : 1;
     if(retCode === 0) {
       logger.log('ETP-IPCHost strted');
     }

@@ -6,7 +6,7 @@ import { IncomingMessage } from 'http'
 // import * as https from 'https'
 import * as http from 'http'
 import * as url from 'url'
-import { Provider, ProviderValidator } from './ipc-provider'
+import { App, AppConfig, Provider, ProviderValidator } from './ipc-provider'
 
 //type of application Information
 type appInfo = { connId : string, appName : string}
@@ -42,12 +42,14 @@ export class IPCHost  {
   private logger : Logger;
   private newConnId = 0;
   private server: any;
+  private apps : App[];
   private providers : Provider[]
   private providerValidator : ProviderValidator
 
-  constructor(logger : Logger, providers :  Provider[], providerValidator : ProviderValidator) {
+  constructor(logger : Logger, appConfig :  AppConfig, providerValidator : ProviderValidator) {
     this.logger = logger
-    this.providers = providers;
+    this.providers = appConfig.providers;
+    this.apps = appConfig.apps;
     this.providerValidator = providerValidator
     // logger.info(" CLient app json is " + JSON.stringify(this.ipcAppConfig))
     // this.validateAppConfig();
@@ -172,8 +174,8 @@ private broadcast(srcWs: WebSocket, type: evnetType, data:any) {
   const sessionId = (clientInfo.clientSessionId === null || clientInfo.clientSessionId === '' || typeof (clientInfo.clientSessionId) === 'undefined') ? null : clientInfo.clientSessionId
   this.log(`Message received from App name: ${clientInfo.appName} / Client id ${clientInfo.connId} / session id : ${sessionId} / message type ${data.type} /key : ${data.key}`, logType.info )
   this.dumpData({fromApp : clientInfo.appName, data :data})
-  let subScribers = this.providerValidator.getSubscribersOfAppEvent(this.providers,clientInfo.appName, 'publish')
-  this.socketStore.forEach((targetClientInfo , targetSocket , mape) => {
+  let subScribers = this.providerValidator.getSubscribersOfAppEvent(this.providers,clientInfo.appName, data.key)
+  this.socketStore.forEach((targetClientInfo , targetSocket ) => {
     //Do not broadcast to origination socket ** this check to be there until we have configuration support like in DF
     if(targetSocket === srcWs)
       return
@@ -227,7 +229,7 @@ private handleInitialize(ws: WebSocket, data:any) {
     return ws.close();
   }
   const appName = data.key? data.key.split(';')[0] : data.key;
-  if(this.providerValidator.checkIfAppNameAllowed(this.providers,appName) == false) {
+  if(this.providerValidator.checkIfAppNameAllowed(this.apps,appName) == false) {
     this.log(`App name is not allowed  ${appName}`, logType.error)
     const message = 'Client is attempting to initialize non-allowed application name. socket will be closed';
     const response = Object.assign({},{

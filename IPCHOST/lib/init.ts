@@ -5,7 +5,7 @@ import * as http from 'http'
 
 import { Logger, loggerFactory } from '../src/ipc-logger';
 import { cliExecuteCommand, cliArgs } from './cli';
-import { ProviderLoaderFactory } from '../src/ipc-provider';
+import { AppConfig, ProviderLoaderFactory } from '../src/ipc-provider';
 import { ProviderValidator } from './../src/ipc-provider';
 const IPCCLILOGGERFILE = 'ETP-IPCCLI-Logger';
 const cwd = process.env.ipcCWD || process.cwd()
@@ -63,10 +63,10 @@ process.on('SIGHUP',() => {
 
 const getAppConfig = async () => {
   const providerLoader = ProviderLoaderFactory(ipcConfig.appConfig, ipcLogger)
-  const providers = await providerLoader.load()
+  const appConfig: AppConfig = await providerLoader.load()
   const providerValidator = new ProviderValidator(ipcLogger)
-  if( providerLoader.validateProviderConfig(providers)) {
-    cliExecuteCommand(cmdArgs,ipcLogger,providers, providerValidator).then((code: number | void ) => {
+  if( providerLoader.validateAppConfig(appConfig.apps) && providerLoader.validateProviderConfig(appConfig.providers) ) {
+    cliExecuteCommand(cmdArgs,ipcLogger,appConfig, providerValidator).then((code: number | void ) => {
       ipcLogger.info(`cliExecuteCommand completed with return code : ${code}`)
     }).catch((err: Error)  => {
       ipcLogger.info(`cliExecuteCommand completed with error : ${err.toString()}`)

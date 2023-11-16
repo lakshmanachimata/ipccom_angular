@@ -1,0 +1,164 @@
+[
+  {
+    "provider": "app1",
+    "events": [
+      {
+        "eventName": "test1",
+        "subsribers": [
+          "app4",
+          "app3"
+        ]
+      },
+      {
+        "eventName": "test2",
+        "subsribers": [
+          "app2",
+          "app3"
+        ]
+      }
+    ],
+    "contexts": [
+      {
+        "contextName": "get",
+        "consumers": [
+          "app3",
+          "app2"
+        ]
+      },
+      {
+        "contextName": "set",
+        "consumers": [
+          "app4"
+        ]
+      }
+    ]
+  },
+  {
+    "provider": "app2",
+    "events": [
+      {
+        "eventName": "test3",
+        "subsribers": [
+          "app1"
+        ]
+      },
+      {
+        "eventName": "test4",
+        "subsribers": [
+          "app2"
+        ]
+      }
+    ],
+    "contexts": [
+      {
+        "contextName": "get",
+        "consumers": [
+          "app1"
+        ]
+      },
+      {
+        "contextName": "set",
+        "consumers": [
+          "app3"
+        ]
+      }
+    ]
+  },
+  {
+    "provider": "app3",
+    "events": [
+      {
+        "eventName": "test5",
+        "subsribers": [
+          "app2"
+        ]
+      },
+      {
+        "eventName": "test6",
+        "subsribers": [
+          "app4"
+        ]
+      }
+    ],
+    "contexts": [
+      {
+        "contextName": "get",
+        "consumers": [
+          "app1"
+        ]
+      },
+      {
+        "contextName": "set",
+        "consumers": [
+          "app2"
+        ]
+      }
+    ]
+  },
+  {
+    "provider": "app4",
+    "events": [
+      {
+        "eventName": "test7",
+        "subsribers": [
+          "app2"
+        ]
+      },
+      {
+        "eventName": "test8",
+        "subsribers": [
+          "app4"
+        ]
+      }
+    ],
+    "contexts": [
+      {
+        "contextName": "get",
+        "consumers": [
+          "app5"
+        ]
+      },
+      {
+        "contextName": "set",
+        "consumers": [
+          "app3",
+          "app1"
+        ]
+      }
+    ]
+  },
+  {
+    "provider": "app5",
+    "events": [
+      {
+        "eventName": "test9",
+        "subsribers": [
+          "app4"
+        ]
+      },
+      {
+        "eventName": "test10",
+        "subsribers": [
+          "app3",
+          "app2"
+        ]
+      }
+    ],
+    "contexts": [
+      {
+        "contextName": "get",
+        "consumers": [
+          "app4",
+          "app1"
+        ]
+      },
+      {
+        "contextName": "set",
+        "consumers": [
+          "app3",
+          "app2"
+        ]
+      }
+    ]
+  }
+]

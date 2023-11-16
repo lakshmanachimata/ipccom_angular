@@ -1,0 +1,26 @@
+[
+  {
+    "provider": "app1",
+    "ait": "111"
+  },
+  {
+    "provider": "app2",
+    "ait": "222"
+  },
+  {
+    "provider": "app3",
+    "ait": "333"
+  },
+  {
+    "provider": "app4",
+    "ait": "444"
+  },
+  {
+    "provider": "app5",
+    "ait": "555"
+  },
+  {
+    "provider": "app6",
+    "ait": "666"
+  }
+]
