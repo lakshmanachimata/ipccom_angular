@@ -177,16 +177,29 @@ private broadcast(srcWs: WebSocket, type: eventType, data:any) {
   let subScribers;
   if(type == eventType.publishedEvent){
       subScribers = this.providerValidator.getSubscribersOfAppEvent(this.providers,clientInfo.appName, data.key);
+      console.log("subscribers of App event ->" + JSON.stringify(subScribers));
   }else if(type == eventType.contextChangeEvent){
-      subScribers = this.providerValidator.getConsumersOfAppContext(this.providers,clientInfo.appName, data.key);
+      subScribers = this.providerValidator.getConsumersOfAppContext(this.providers,clientInfo.appName, 'set');
+      console.log("consumers of App context ->" + JSON.stringify(subScribers));
   }
+
   this.socketStore.forEach((targetClientInfo , targetSocket ) => {
     //Do not broadcast to origination socket ** this check to be there until we have configuration support like in DF
     if(targetSocket === srcWs)
       return
     if(!subScribers.includes(targetClientInfo.appName)){
-      this.log(`The appName ${targetClientInfo.appName} not allowed for subscribing to the app ${clientInfo.appName} for publish event`, logType.info)
+      if(type == eventType.publishedEvent){
+          this.log(`The appName ${targetClientInfo.appName} not allowed for subscribing to the app ${clientInfo.appName} for publish event`, logType.info)
+      }else if(type == eventType.contextChangeEvent){
+          this.log(`The appName ${targetClientInfo.appName} not allowed for setting the context to the app ${clientInfo.appName}`, logType.info)
+      }
       return
+    }else{
+      if(type == eventType.publishedEvent){
+          this.log(`The appName ${targetClientInfo.appName} allowed for subscribing to the app ${clientInfo.appName} for publish event`, logType.info)
+      }else if(type == eventType.contextChangeEvent){
+          this.log(`The appName ${targetClientInfo.appName} allowed for setting the context to the app ${clientInfo.appName}`, logType.info)
+      }
     }
     if(sessionId)
       this.wsEmitToUserSession(sessionId,targetClientInfo,targetSocket, type, data)
