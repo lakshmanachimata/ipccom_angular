@@ -174,7 +174,12 @@ private broadcast(srcWs: WebSocket, type: evnetType, data:any) {
   const sessionId = (clientInfo.clientSessionId === null || clientInfo.clientSessionId === '' || typeof (clientInfo.clientSessionId) === 'undefined') ? null : clientInfo.clientSessionId
   this.log(`Message received from App name: ${clientInfo.appName} / Client id ${clientInfo.connId} / session id : ${sessionId} / message type ${data.type} /key : ${data.key}`, logType.info )
   this.dumpData({fromApp : clientInfo.appName, data :data})
-  let subScribers = this.providerValidator.getSubscribersOfAppEvent(this.providers,clientInfo.appName, data.key)
+  let subScribers;
+  if(evnetType.publishedEvent){
+      subScribers = this.providerValidator.getSubscribersOfAppEvent(this.providers,clientInfo.appName, data.key);
+  }else if(evnetType.contextChangeEvent){
+      subScribers = this.providerValidator.getConsumersOfAppContext(this.providers,clientInfo.appName, data.key);
+  }
   this.socketStore.forEach((targetClientInfo , targetSocket ) => {
     //Do not broadcast to origination socket ** this check to be there until we have configuration support like in DF
     if(targetSocket === srcWs)
