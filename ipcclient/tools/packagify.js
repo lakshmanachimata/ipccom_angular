@@ -41,6 +41,8 @@ const copyConfiguration = () => {
         });
         console.log('with in copyConfiguration3');
       } else{
+        console.log("targetFolderExists -->" + targetFolderExists);
+        console.log("srcConfigFolderExists -->" + srcConfigFolderExists);
         reject(new Error('copyConfiguration failed'))
       }
     })

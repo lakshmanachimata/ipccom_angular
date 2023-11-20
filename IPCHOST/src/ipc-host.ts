@@ -18,7 +18,7 @@ const enum logType {
   info = 'info',
   log = 'log'
 }
-const enum evnetType {
+const enum eventType {
   contextChangeEvent = 'contextChange',
   publishedEvent = 'publishedEvent',
   navigateEvent = 'navigateEvent',
@@ -168,16 +168,16 @@ export class IPCHost  {
  * @data Messaage payload
  */
 
-private broadcast(srcWs: WebSocket, type: evnetType, data:any) {
+private broadcast(srcWs: WebSocket, type: eventType, data:any) {
   //get the src client  info and check if clientSessionId is not empty
   const clientInfo = this.socketStore.get(srcWs);
   const sessionId = (clientInfo.clientSessionId === null || clientInfo.clientSessionId === '' || typeof (clientInfo.clientSessionId) === 'undefined') ? null : clientInfo.clientSessionId
   this.log(`Message received from App name: ${clientInfo.appName} / Client id ${clientInfo.connId} / session id : ${sessionId} / message type ${data.type} /key : ${data.key}`, logType.info )
   this.dumpData({fromApp : clientInfo.appName, data :data})
   let subScribers;
-  if(evnetType.publishedEvent){
+  if(type == eventType.publishedEvent){
       subScribers = this.providerValidator.getSubscribersOfAppEvent(this.providers,clientInfo.appName, data.key);
-  }else if(evnetType.contextChangeEvent){
+  }else if(type == eventType.contextChangeEvent){
       subScribers = this.providerValidator.getConsumersOfAppContext(this.providers,clientInfo.appName, data.key);
   }
   this.socketStore.forEach((targetClientInfo , targetSocket ) => {
@@ -195,12 +195,12 @@ private broadcast(srcWs: WebSocket, type: evnetType, data:any) {
   });
 }
 // citrix server, cloud specific
-private wsEmitToUserSession(srcSessionId: string, targetClientInfo: any, ws: WebSocket, type: evnetType, data: any) {
+private wsEmitToUserSession(srcSessionId: string, targetClientInfo: any, ws: WebSocket, type: eventType, data: any) {
   if(targetClientInfo.clientSessionId == srcSessionId)
     this.wsEmit(ws,type, data.key, data.data, targetClientInfo)
 }
 
-private wsEmit(ws: WebSocket, type: evnetType, key: string, data: any,  targetClientInfo: any) {
+private wsEmit(ws: WebSocket, type: eventType, key: string, data: any,  targetClientInfo: any) {
   if(ws.readyState === WebSocket.OPEN) {
     // this.outputMsg('Msg to client ' + GetSocketInfo(ws) + ';' +  DataToString(type, key, data));
     ws.send(JSON.stringify({
@@ -230,7 +230,7 @@ private handleInitialize(ws: WebSocket, data:any) {
     const response = Object.assign({},{
         success: false, duplicate: false, message: message
       });
-    this.wsEmit(ws, evnetType.initializeResponse,(data && data.key) ? data.key : 'Application name is not provided', response, null);
+    this.wsEmit(ws, eventType.initializeResponse,(data && data.key) ? data.key : 'Application name is not provided', response, null);
     return ws.close();
   }
   const appName = data.key? data.key.split(';')[0] : data.key;
@@ -240,7 +240,7 @@ private handleInitialize(ws: WebSocket, data:any) {
     const response = Object.assign({},{
       success: false, duplicate: false, message: message
     });
-    this.wsEmit(ws, evnetType.initializeResponse,(data && data.key) ? data.key : 'Application name is not allowed', response, null);
+    this.wsEmit(ws, eventType.initializeResponse,(data && data.key) ? data.key : 'Application name is not allowed', response, null);
     return ws.close();
   }
   const clientInfo = this.socketStore.get(ws);
@@ -253,7 +253,7 @@ private handleInitialize(ws: WebSocket, data:any) {
     const response = Object.assign({},{
       success: true, duplicate: duplicate, message: duplicate? 'There is already an application connected and initialized with same information' : ''
     });
-    this.wsEmit(ws, evnetType.initializeResponse, appName, response, clientInfo)
+    this.wsEmit(ws, eventType.initializeResponse, appName, response, clientInfo)
     this.log(`Application ${appName} initialized with Client Id: ${clientInfo.connId} and Session Id: ${clientInfo.clientSessionId}`, logType.info)
     this.dumpData(response)
   } else {
@@ -294,7 +294,7 @@ private handleInitialize(ws: WebSocket, data:any) {
   if(!this.isClientInitialized(ws)) {
     return
   }
-  this.broadcast(ws,evnetType.publishedEvent, data)
+  this.broadcast(ws,eventType.publishedEvent, data)
  }
 
   /**
@@ -314,14 +314,14 @@ private handleInitialize(ws: WebSocket, data:any) {
     this.currentContextStore.set(key, data.data);
     if(fireChange) {
       this.log(`About to fire context change for new data via set for ${data.key}`, logType.info);
-      this.broadcast(ws, evnetType.contextChangeEvent, data)
+      this.broadcast(ws, eventType.contextChangeEvent, data)
     }
   }
   private handleNavigateTo(ws:WebSocket, data:any) {
     if(!this.isClientInitialized(ws)) {
       return
     }
-    this.broadcast(ws, evnetType.navigateEvent, data)
+    this.broadcast(ws, eventType.navigateEvent, data)
   }
   private handleGetContext(ws:WebSocket, data:any) {
     if(!this.isClientInitialized(ws)) {
@@ -337,11 +337,11 @@ private handleInitialize(ws: WebSocket, data:any) {
         }
       }
       const currContext = this.currentContextStore.get(currKey);
-      this.wsEmit(ws, evnetType.contextGetEvent, data.key, currContext ? currContext : null, clientInfo)
+      this.wsEmit(ws, eventType.contextGetEvent, data.key, currContext ? currContext : null, clientInfo)
     } else {
       this.logger.info('Retrieving all context data');
       const allContexts = Object.assign({}, this.copyObjects(clientInfo));
-      this.wsEmit(ws, evnetType.contextGetEvent, data.key, JSON.stringify(allContexts), clientInfo)
+      this.wsEmit(ws, eventType.contextGetEvent, data.key, JSON.stringify(allContexts), clientInfo)
     }
   }
 
