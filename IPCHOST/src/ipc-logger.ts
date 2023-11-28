@@ -74,7 +74,7 @@ export class LoggerBase extends Observable<LogEntry> implements Logger {
       let payLoadStr;
       try {
         payLoadStr = JSON.stringify(payLoad);
-      } catch (e: any) {
+      } catch (e) {
         payLoadStr = `An error occurred while parsing logger data. Details: ${e.message}`;
       }
       const message = { message: payLoadStr };

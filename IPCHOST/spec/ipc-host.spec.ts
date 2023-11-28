@@ -10,7 +10,33 @@ describe('IPCHost Connect',()=>{
     let providerValidator: ProviderValidator;
 
     beforeAll(()=>{
+    })
+
+    afterAll(()=>{
+    })
+
+    beforeEach(()=>{
         process.env.ipcCWD = './IPCHost';
+        appConfig = {
+            apps: [
+                {
+                    appId: 'testApp',
+                    ait: '111'
+                }
+            ],
+            providers: [
+                {
+                    provider: 'testApp',
+                    events: [
+                        {
+                            eventName: 'event1',
+                            members: ['member1', 'member2']
+                        }
+                    ],
+                    contexts: []
+                }
+            ]
+        };
         logger = {
             info: (message: Object | string): void=>{
             },
@@ -23,23 +49,10 @@ describe('IPCHost Connect',()=>{
         };
         spyOn(logger, 'info');
         ipc = new IPCHost(logger, appConfig, providerValidator);
-
-    })
-
-    afterAll(()=>{
-        ipc.closeServer();
-    })
-
-    beforeAll(()=>{
-
-    })
-
-    beforeEach(()=>{
-        
     })
     
     afterEach(()=>{
-        
+        ipc.closeServer();
     })
 
     it('it calls logger info as part of ipcHost',()=>{

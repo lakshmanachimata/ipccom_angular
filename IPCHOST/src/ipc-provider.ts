@@ -162,7 +162,7 @@ const loadRemoteJson = async (ipcLogger: Logger,jsonType: JsonType): Promise<any
           return resolve(loadFileProviders())
         }
       });
-    } catch (e: any) {
+    } catch (e) {
       ipcLogger.error(`provider json loading from remote failed with error ${e.message}`)
       if(jsonType == JsonType.app){
         return resolve(loadFileApps())
@@ -186,7 +186,7 @@ class RemoteProviderLoader implements ProviderLoader {
         let apps: App[] = await loadRemoteJson(this.ipcLogger,JsonType.app)
         let providers: Provider[] = await loadRemoteJson(this.ipcLogger,JsonType.provider)
         resolve({apps,providers})
-      }catch(e: any){
+      }catch(e){
         const error = e as Error;
         this.ipcLogger.error(`provider json loading from remote failed with error ${error.message}`)
         resolve(loadFileAppConfigs())

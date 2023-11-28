@@ -5,8 +5,8 @@ import * as http from 'http'
 
 import { Logger, loggerFactory } from '../src/ipc-logger';
 import { cliExecuteCommand, cliArgs } from './cli';
-import { AppConfig, ProviderLoaderFactory } from '../src/ipc-provider';
-import { ProviderValidator } from './../src/ipc-provider';
+import { ProviderValidator, ProviderLoaderFactory } from '../src/ipc-provider';
+import { AppConfig } from '../src/ipc-enums';
 const IPCCLILOGGERFILE = 'ETP-IPCCLI-Logger';
 const cwd = process.env.ipcCWD || process.cwd()
 const ipcConfig = JSON.parse(fs.readFileSync(path.resolve(cwd,'../configuration/ipc.json'), 'utf-8'))

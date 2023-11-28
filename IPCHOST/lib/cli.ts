@@ -1,4 +1,5 @@
-import { AppConfig, Provider, ProviderValidator } from './../src/ipc-provider';
+import { ProviderValidator } from './../src/ipc-provider';
+import { AppConfig, Provider } from './../src/ipc-enums';
 //const WebSocket = require('ws')
 import { IPCHost } from '../src/ipc-host'
 import { Logger } from '../src/ipc-logger'

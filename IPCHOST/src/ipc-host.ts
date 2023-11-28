@@ -367,7 +367,7 @@ private handleInitialize(ws: WebSocket, data:any) {
           return true;
         else
           throw new Error('An attempt to connect with out proper url path. Closing the connection from this client')
-    }catch (e: any) {
+    }catch (e) {
       this.log(e.message, logType.error)
       this.dumpData(req.headers);
       return false;
@@ -471,7 +471,7 @@ private dumpData(...data): void {
           throw new Error(data)
       } else
         throw new Error(data)
-    }catch(e: any) {
+    }catch(e) {
       this.log(`Client payload is not in the proper format. Data received : ${e.message}`, logType.error)
     }
   }

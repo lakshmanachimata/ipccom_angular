@@ -14,7 +14,7 @@ describe('ProviderValidator', () => {
     it('should return an empty array if no matching provider is found', () => {
       const providers: Provider[] = [];
       const appName = 'nonexistentApp';
-      const memberType = 'eventType.publishedEvent';
+      const memberType = 'publishedEvent';
       const memberTypeName = 'eventName';
 
       const result = providerValidator.getMembersOfApplicationId(providers, appName, memberType, memberTypeName);
@@ -36,7 +36,7 @@ describe('ProviderValidator', () => {
         }
       ];
       const appName = 'myApp';
-      const memberType = 'eventType.publishedEvent';
+      const memberType = 'publishedEvent';
       const memberTypeName = 'event1';
 
       const result = providerValidator.getMembersOfApplicationId(providers, appName, memberType, memberTypeName);
@@ -75,7 +75,7 @@ describe('ProviderValidator', () => {
     it('should return false if no members are found for the given app and member type', () => {
       const providers: Provider[] = [];
       const appName = 'myApp';
-      const memberType = 'eventType.publishedEvent';
+      const memberType = 'publishedEvent';
       const memberTypeName = 'event1';
 
       const result = providerValidator.validateConfigForTheApp(providers, appName, memberType, memberTypeName);
@@ -97,7 +97,7 @@ describe('ProviderValidator', () => {
         }
       ];
       const appName = 'myApp';
-      const memberType = 'eventType.publishedEvent';
+      const memberType = 'publishedEvent';
       const memberTypeName = 'event1';
 
       const result = providerValidator.validateConfigForTheApp(providers, appName, memberType, memberTypeName);
