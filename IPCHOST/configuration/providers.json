@@ -4,14 +4,14 @@
     "events": [
       {
         "eventname": "publish",
-        "subsribers": [
+        "members": [
           "app4",
           "app3"
         ]
       },
       {
         "eventname": "test2",
-        "subsribers": [
+        "members": [
           "app2",
           "app3"
         ]
@@ -23,33 +23,33 @@
     "events": [
       {
         "eventname": "get",
-        "subsribers": [
+        "members": [
           "app1",
           "app3"
         ]
       },
       {
         "eventname": "publish",
-        "subsribers": [
+        "members": [
           "app1"        ]
       },
       {
         "eventname": "ev4",
-        "subsribers": [
+        "members": [
           "sub7",
           "sub8"
         ]
       },
       {
         "eventname": "ev4",
-        "subsribers": [
+        "members": [
           "sub7",
           "sub8"
         ]
       },
       {
         "eventname": "ev5",
-        "subsribers": [
+        "members": [
           "sub7",
           "sub8"
         ]
@@ -61,14 +61,14 @@
     "events": [
       {
         "eventname": "ev3",
-        "subsribers": [
+        "members": [
           "sub5",
           "sub6"
         ]
       },
       {
         "eventname": "ev4",
-        "subsribers": [
+        "members": [
           "sub7",
           "sub8"
         ]
@@ -80,14 +80,14 @@
     "events": [
       {
         "eventname": "ev3",
-        "subsribers": [
+        "members": [
           "sub5",
           "sub6"
         ]
       },
       {
         "eventname": "ev4",
-        "subsribers": [
+        "members": [
           "sub7",
           "sub8"
         ]
@@ -99,14 +99,14 @@
     "events": [
       {
         "eventname": "ev3",
-        "subsribers": [
+        "members": [
           "sub5",
           "sub6"
         ]
       },
       {
         "eventname": "ev4",
-        "subsribers": [
+        "members": [
           "sub7",
           "sub8"
         ]

@@ -4,14 +4,14 @@
     "events": [
       {
         "eventName": "test1",
-        "subsribers": [
+        "members": [
           "app4",
           "app3"
         ]
       },
       {
         "eventName": "test2",
-        "subsribers": [
+        "members": [
           "app2",
           "app3"
         ]
@@ -20,14 +20,14 @@
     "contexts": [
       {
         "contextName": "get",
-        "consumers": [
+        "members": [
           "app3",
           "app2"
         ]
       },
       {
         "contextName": "set",
-        "consumers": [
+        "members": [
           "app4"
         ]
       }
@@ -38,13 +38,13 @@
     "events": [
       {
         "eventName": "test3",
-        "subsribers": [
+        "members": [
           "app1"
         ]
       },
       {
         "eventName": "test4",
-        "subsribers": [
+        "members": [
           "app2"
         ]
       }
@@ -52,13 +52,13 @@
     "contexts": [
       {
         "contextName": "get",
-        "consumers": [
+        "members": [
           "app1"
         ]
       },
       {
         "contextName": "set",
-        "consumers": [
+        "members": [
           "app3"
         ]
       }
@@ -69,13 +69,13 @@
     "events": [
       {
         "eventName": "test5",
-        "subsribers": [
+        "members": [
           "app2"
         ]
       },
       {
         "eventName": "test6",
-        "subsribers": [
+        "members": [
           "app4"
         ]
       }
@@ -83,13 +83,13 @@
     "contexts": [
       {
         "contextName": "get",
-        "consumers": [
+        "members": [
           "app1"
         ]
       },
       {
         "contextName": "set",
-        "consumers": [
+        "members": [
           "app2"
         ]
       }
@@ -100,13 +100,13 @@
     "events": [
       {
         "eventName": "test7",
-        "subsribers": [
+        "members": [
           "app2"
         ]
       },
       {
         "eventName": "test8",
-        "subsribers": [
+        "members": [
           "app4"
         ]
       }
@@ -114,13 +114,13 @@
     "contexts": [
       {
         "contextName": "get",
-        "consumers": [
+        "members": [
           "app5"
         ]
       },
       {
         "contextName": "set",
-        "consumers": [
+        "members": [
           "app3",
           "app1"
         ]
@@ -132,13 +132,13 @@
     "events": [
       {
         "eventName": "test9",
-        "subsribers": [
+        "members": [
           "app4"
         ]
       },
       {
         "eventName": "test10",
-        "subsribers": [
+        "members": [
           "app3",
           "app2"
         ]
@@ -147,14 +147,14 @@
     "contexts": [
       {
         "contextName": "get",
-        "consumers": [
+        "members": [
           "app4",
           "app1"
         ]
       },
       {
         "contextName": "set",
-        "consumers": [
+        "members": [
           "app3",
           "app2"
         ]

@@ -68,15 +68,17 @@ export class LoggerBase extends Observable<LogEntry> implements Logger {
   }
 
   dumpData(...data: any): void {
-    if(this.logData == true && this.logLevel == 'info') {
-      this.logType == logType.info
-      const payLoad = {...data}
+    if (this.logData == true && this.logLevel == 'info') {
+      this.logType = logType.info;
+      const payLoad = { ...data };
       let payLoadStr;
       try {
-        payLoadStr = JSON.stringify(payLoad)
-      } catch(e) { payLoadStr = `An error occured while parsing logger data. Details: ${e.message}` }
-      const message = {message : payLoadStr}
-      this.write(message)
+        payLoadStr = JSON.stringify(payLoad);
+      } catch (e: any) {
+        payLoadStr = `An error occurred while parsing logger data. Details: ${e.message}`;
+      }
+      const message = { message: payLoadStr };
+      this.write(message);
     }
   }
 };

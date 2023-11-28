@@ -1,0 +1,32 @@
+{
+    "compilerOptions": {
+        "target": "ES5", /* */
+        "module": "CommonJS",
+        "lib": [
+            "ES2015",
+            "ES2016",
+            "ES2017",
+        ],
+        "outDir": "../_unit_js",
+        "rootDir": "../",
+        "removeComments": true,
+        "strict": true,
+        "noImplicitAny": false,
+        "moduleResolution": "Node",
+        "stripInternal": true,
+        "skipLibCheck": true,
+        "sourceMap": true,
+        "typeRoots": [
+            "../node_modules/@types"
+        ],
+        "types": [
+            "node",
+            "jasmine"
+        ],
+        "esModuleInterop": true,
+    },
+    "exclude": [
+        "../node_modules/**",
+        "../src/*.ts"
+    ]
+}

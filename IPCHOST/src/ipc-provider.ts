@@ -2,53 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as http from 'http'
 import { Logger } from './ipc-logger';
+import { App, LoadType, JsonType, Context, Event, Provider, AppConfig, ProviderLoader, eventType } from './ipc-enums';
 const cwd = process.env.ipcCWD || process.cwd()
-
-
-
-
-export interface App {
-  appId: String,
-  ait: String
-}
-
-const enum LoadType {
-  local = 'local',
-  remote = "remote",
-}
-
-const enum JsonType {
-  app = 'app',
-  provider = "provider",
-}
-
-export interface Context {
-  contextName: String
-  consumers: String[]
-}
-
-export interface Event {
-  eventName: String
-  subsribers: String[]
-}
-
-export interface Provider {
-  provider : String,
-  events : Event[]
-  contexts : Context[]
-}
-
-export interface AppConfig {
-  apps: App[]
-  providers: Provider[]
-}
-
-export interface ProviderLoader {
-  load(): Promise< AppConfig >;
-  validateProviderConfig(providers : Provider[]): boolean
-  validateAppConfig(apps : App[]): boolean
-}
-
 
 
 /**
@@ -75,11 +30,13 @@ const validateAppsConfig = (appConfig : App[], ipcLogger : Logger): boolean =>
         }
       }
     }
+    /*
     if(aitdupes.length) {
       for (var eai = 0;  eai < aitdupes.length; eai++ ) {
         ipcLogger.info(` duplicate ait ${aitdupes[eai].value} found at position ${aitdupes[eai].key+1}  for the ${aitdupes[eai].app}`)
       }
     }
+    */
     if(appdups.length) {
       for (var dai = 0;  dai < appdups.length; dai++ ) {
         ipcLogger.info(` duplicate app ${appdups[dai].value} found at position ${appdups[dai].key+1}  `)
@@ -179,7 +136,7 @@ class LocalProviderLoader implements ProviderLoader {
   }
 }
 
-const loadRemoteApps = async (ipcLogger: Logger,jsonType: JsonType): Promise<App[]> => {
+const loadRemoteJson = async (ipcLogger: Logger,jsonType: JsonType): Promise<any> => {
   return new Promise((resolve, reject) => {
     try {
       var options = {
@@ -198,45 +155,23 @@ const loadRemoteApps = async (ipcLogger: Logger,jsonType: JsonType): Promise<App
       });
 
       req.on('error', (e) => {
-        ipcLogger.error(`provider json loading from remote failed with error ${e.message}`)
+        ipcLogger.error(`provider json loading from remote failed with error ${e.message}`);
+        if(jsonType == JsonType.app){
+          return resolve(loadFileApps())
+        }else if(jsonType == JsonType.provider) {
+          return resolve(loadFileProviders())
+        }
+      });
+    } catch (e: any) {
+      ipcLogger.error(`provider json loading from remote failed with error ${e.message}`)
+      if(jsonType == JsonType.app){
         return resolve(loadFileApps())
-      });
-    }catch(e){
-      ipcLogger.error(`provider json loading from remote failed with error ${e.message}`)
-      return resolve(loadFileApps())
-    }
-  })
-}
-
-const loadRemoteProviders = async (ipcLogger: Logger,jsonType: JsonType): Promise<Provider[]> => {
-  return new Promise((resolve, reject) => {
-    try {
-      var options = {
-        host: 'localhost',
-        port:4000,
-        path: ''
-      };
-      var req = http.get(options, function(res) {
-        let rawData = '';
-        res.on('data', function(chunk) {
-          rawData += chunk;
-        }).on('end', function() {
-          var body = JSON.parse(rawData)
-          resolve(body)
-        })
-      });
-
-      req.on('error', (e) => {
-        ipcLogger.error(`provider json loading from remote failed with error ${e.message}`)
+      }else if(jsonType == JsonType.provider) {
         return resolve(loadFileProviders())
-      });
-    }catch(e){
-      ipcLogger.error(`provider json loading from remote failed with error ${e.message}`)
-      return resolve(loadFileProviders())
+      }
     }
   })
 }
-
 
 class RemoteProviderLoader implements ProviderLoader {
   ipcLogger : Logger;
@@ -248,11 +183,12 @@ class RemoteProviderLoader implements ProviderLoader {
   public async load(): Promise<AppConfig> {
     return new Promise( async (resolve, reject) => {
       try {
-        let apps: App[] = await loadRemoteApps(this.ipcLogger,JsonType.app)
-        let providers: Provider[] = await loadRemoteProviders(this.ipcLogger,JsonType.provider)
+        let apps: App[] = await loadRemoteJson(this.ipcLogger,JsonType.app)
+        let providers: Provider[] = await loadRemoteJson(this.ipcLogger,JsonType.provider)
         resolve({apps,providers})
-      }catch(e){
-        this.ipcLogger.error(`provider json loading from remote failed with error ${e.message}`)
+      }catch(e: any){
+        const error = e as Error;
+        this.ipcLogger.error(`provider json loading from remote failed with error ${error.message}`)
         resolve(loadFileAppConfigs())
       }
     })
@@ -270,12 +206,23 @@ export class ProviderValidator  {
   constructor( logger : Logger) {
     this.ipcLogger = logger;
   }
-  public getSubscribersOfAppEvent(providers: Provider[],appName: string , eventName): String[] {
+
+  public getMembersOfApplicationId(providers: Provider[], appName: string, memberType: string, memberTypeName: string): String[] {
+    let members: any = [];
     for(let  ai = 0; ai < providers.length; ai++) {
       if(providers[ai].provider == appName) {
-        for(let ei = 0; ei < providers[ai].events.length; ei++){
-          if (providers[ai].events[ei].eventName === eventName){
-            return providers[ai].events[ei].subsribers
+        if(memberType == eventType.publishedEvent) {
+          members = providers[ai].events;
+        }else if(memberType == eventType.contextChangeEvent) {
+          members = providers[ai].contexts;
+        }else {
+          return []
+        }
+        for(let ei = 0; ei < members.length; ei++){
+          if (members[ei].eventName === memberTypeName){
+            return members[ei].members
+          }else if (members[ei].contextName === memberTypeName){
+            return members[ei].members
           }
         }
       }
@@ -283,35 +230,6 @@ export class ProviderValidator  {
     return []
   }
 
-  public getConsumersOfAppContext(providers: Provider[],appName: string , contextName): String[] {
-    for(let  ai = 0; ai < providers.length; ai++) {
-      if(providers[ai].provider == appName) {
-        for(let ci = 0; ci < providers[ai].contexts.length; ci++){
-          if (providers[ai].contexts[ci].contextName === contextName){
-            return providers[ai].contexts[ci].consumers
-          }
-        }
-      }
-    }
-    return []
-  }
-
-  public getEventsOfAppName(providers: Provider[],appName: string): Event[] {
-    for(let  ai = 0; ai < providers.length; ai++) {
-      if(providers[ai].provider == appName) {
-        return providers[ai].events
-      }
-    }
-    return []
-  }
-  public getContextsOfAppName(providers: Provider[],appName: string): Context[] {
-    for(let  ai = 0; ai < providers.length; ai++) {
-      if(providers[ai].provider == appName) {
-        return providers[ai].contexts
-      }
-    }
-    return []
-  }
   public checkIfAppNameAllowed(apps: App[],appName: string): boolean {
     if(apps.length) {
       for(let  ai = 0; ai < apps.length; ai++) {
@@ -324,26 +242,13 @@ export class ProviderValidator  {
     }
     return false;
   }
-  public validateEventConfigForTheAppInPublish(providers: Provider[],appName: string, eventName: string): boolean {
-    console.log(`validateEventConfigForTheAppInPublish with ${appName} and ${eventName}`)
-    const eventNames = this.getEventsOfAppName(providers,appName)
-    console.log(`validateEventConfigForTheApp eventNames ${JSON.stringify(eventNames)}`)
-    if(!eventNames.length) return false;
-    for(let ei = 0;  ei < eventNames.length; ei++) {
-      if(eventName == eventNames[ei].eventName) return true
-    }
-    return false
+
+  public validateConfigForTheApp(providers: Provider[],appName: string, memberType: string, memberTypeName: string): boolean {
+    const members = this.getMembersOfApplicationId(providers,appName,memberType,memberTypeName)
+    if(!members.length) return false;
+    return true
   }
-  public validateContextConfigForTheAppInContext(providers: Provider[],appName: string, contextName: string): boolean {
-    console.log(`validateContextConfigForTheAppInContext with ${appName} and ${contextName}`)
-    const contextNames = this.getContextsOfAppName(providers,appName)
-    console.log(`validateEventConfigForTheApp eventNames ${JSON.stringify(contextNames)}`)
-    if(!contextNames.length) return false;
-    for(let ei = 0;  ei < contextNames.length; ei++) {
-      if(contextName == contextNames[ei].contextName) return true
-    }
-    return false
-  }
+
 }
 
 

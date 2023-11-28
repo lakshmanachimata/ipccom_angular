@@ -6,25 +6,13 @@ import { IncomingMessage } from 'http'
 // import * as https from 'https'
 import * as http from 'http'
 import * as url from 'url'
-import { App, AppConfig, Provider, ProviderValidator } from './ipc-provider'
+import { App, AppConfig, Provider, logType, eventType } from './ipc-enums'
+import { ProviderValidator } from './ipc-provider'
 
 //type of application Information
 type appInfo = { connId : string, appName : string}
 //message type
 type message = {type : string , key : string , data :  object | any }
-//valid logger types
-const enum logType {
-  error = 'error',
-  info = 'info',
-  log = 'log'
-}
-const enum eventType {
-  contextChangeEvent = 'contextChange',
-  publishedEvent = 'publishedEvent',
-  navigateEvent = 'navigateEvent',
-  contextGetEvent = 'getValueReturn',
-  initializeResponse = 'initializeResponse'
-}
 
 
 /**
@@ -102,9 +90,9 @@ export class IPCHost  {
           })
           resolve(0)
         });
-      }catch(error) {
-        this.log(error.message , logType.error)
-        reject(1)
+      } catch (error) {
+        this.log((error as Error).message, logType.error);
+        reject(1);
       }
     })
   }
@@ -176,10 +164,10 @@ private broadcast(srcWs: WebSocket, type: eventType, data:any) {
   this.dumpData({fromApp : clientInfo.appName, data :data})
   let subScribers;
   if(type == eventType.publishedEvent){
-      subScribers = this.providerValidator.getSubscribersOfAppEvent(this.providers,clientInfo.appName, data.key);
+      subScribers = this.providerValidator.getMembersOfApplicationId(this.providers, clientInfo.appName, eventType.publishedEvent, data.key);
       console.log("subscribers of App event ->" + JSON.stringify(subScribers));
   }else if(type == eventType.contextChangeEvent){
-      subScribers = this.providerValidator.getConsumersOfAppContext(this.providers,clientInfo.appName, 'set');
+      subScribers = this.providerValidator.getMembersOfApplicationId(this.providers, clientInfo.appName, eventType.contextChangeEvent, 'set');
       console.log("consumers of App context ->" + JSON.stringify(subScribers));
   }
 
@@ -379,7 +367,7 @@ private handleInitialize(ws: WebSocket, data:any) {
           return true;
         else
           throw new Error('An attempt to connect with out proper url path. Closing the connection from this client')
-    }catch (e) {
+    }catch (e: any) {
       this.log(e.message, logType.error)
       this.dumpData(req.headers);
       return false;
@@ -483,7 +471,7 @@ private dumpData(...data): void {
           throw new Error(data)
       } else
         throw new Error(data)
-    }catch(e) {
+    }catch(e: any) {
       this.log(`Client payload is not in the proper format. Data received : ${e.message}`, logType.error)
     }
   }
