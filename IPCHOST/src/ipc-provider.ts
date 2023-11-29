@@ -59,6 +59,7 @@ const validateProvidersConfig = (appConfig : Provider[], ipcLogger : Logger): bo
   let valid : boolean = true
   let appdups : any[] = [];
   let eventdups : any[] = [];
+  let contextdups : any[] = [];
   if(appConfig.length) {
     for(let  ai = 0; ai < appConfig.length; ai++) {
       for(let aj = ai + 1; aj < appConfig.length; aj++) {
@@ -72,6 +73,18 @@ const validateProvidersConfig = (appConfig : Provider[], ipcLogger : Logger): bo
             eventdups.push({key : ej, value : appConfig[ai].events[ej].eventName, app : appConfig[ai].provider})
           }
         }
+      }
+      for(let  ci = 0; ci < appConfig[ai].contexts.length; ci++) {
+        for(let cj = ci + 1; cj < appConfig[ai].contexts.length; cj++) {
+          if(appConfig[ai].contexts[ci].contextName == appConfig[ai].contexts[cj].contextName) {
+            contextdups.push({key : cj, value : appConfig[ai].contexts[cj].contextName, app : appConfig[ai].provider})
+          }
+        }
+      }
+    }
+    if(contextdups.length) {
+      for (var cai = 0;  cai < contextdups.length; cai++ ) {
+        ipcLogger.info(` duplicate provider ${contextdups[cai].value} found at position ${contextdups[cai].key+1}  for the ${contextdups[cai].app}`)
       }
     }
     if(eventdups.length) {
