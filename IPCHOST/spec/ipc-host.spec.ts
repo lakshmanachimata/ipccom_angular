@@ -1,7 +1,7 @@
 import { IPCHost } from "../src/ipc-host";
 import { Logger } from "../src/ipc-logger";
 import { ProviderValidator } from '../src/ipc-provider';
-import { AppConfig, Provider } from '../src/ipc-enums';
+import { AppConfig, Provider } from '../src/ipc-definitions';
 import { WebSocket } from 'ws';
 
 describe('IPCHost Connect', () => {

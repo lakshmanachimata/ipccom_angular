@@ -6,7 +6,7 @@ import { IncomingMessage } from 'http'
 // import * as https from 'https'
 import * as http from 'http'
 import * as url from 'url'
-import { App, AppConfig, Provider, logType, eventType } from './ipc-enums'
+import { App, AppConfig, Provider, logType, eventType } from './ipc-definitions'
 import { ProviderValidator } from './ipc-provider'
 
 //type of application Information
@@ -161,15 +161,9 @@ private broadcast(srcWs: WebSocket, type: eventType, data:any) {
   const clientInfo = this.socketStore.get(srcWs);
   const sessionId = (clientInfo.clientSessionId === null || clientInfo.clientSessionId === '' || typeof (clientInfo.clientSessionId) === 'undefined') ? null : clientInfo.clientSessionId
   this.log(`Message received from App name: ${clientInfo.appName} / Client id ${clientInfo.connId} / session id : ${sessionId} / message type ${data.type} /key : ${data.key}`, logType.info )
-  this.dumpData({fromApp : clientInfo.appName, data :data})
-  let subScribers;
-  if(type == eventType.publishedEvent){
-      subScribers = this.providerValidator.getMembersOfApplicationId(this.providers, clientInfo.appName, eventType.publishedEvent, data.key);
-      console.log("subscribers of App event ->" + JSON.stringify(subScribers));
-  }else if(type == eventType.contextChangeEvent){
-      subScribers = this.providerValidator.getMembersOfApplicationId(this.providers, clientInfo.appName, eventType.contextChangeEvent, 'set');
-      console.log("consumers of App context ->" + JSON.stringify(subScribers));
-  }
+  //this.dumpData({fromApp : clientInfo.appName, data :data})
+  let subScribers = this.providerValidator.getMembersOfApplicationId(this.providers, clientInfo.appName, type, data.key);
+  console.log('subscribers of App'+ type +' / ->' + JSON.stringify(subScribers));
 
   this.socketStore.forEach((targetClientInfo , targetSocket ) => {
     //Do not broadcast to origination socket ** this check to be there until we have configuration support like in DF

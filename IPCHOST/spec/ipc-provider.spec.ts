@@ -1,6 +1,6 @@
 import { ProviderValidator } from '../src/ipc-provider';
 import { Logger } from "../src/ipc-logger";
-import { App, Provider } from '../src/ipc-enums';
+import { App, Provider } from '../src/ipc-definitions';
 
 describe('ProviderValidator', () => {
   let providerValidator: ProviderValidator;

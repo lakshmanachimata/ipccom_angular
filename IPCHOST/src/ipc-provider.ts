@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as http from 'http'
 import { Logger } from './ipc-logger';
-import { App, LoadType, JsonType, Context, Event, Provider, AppConfig, ProviderLoader, eventType } from './ipc-enums';
+import { App, LoadType, JsonType, Context, Event, Provider, AppConfig, ProviderLoader, eventType } from './ipc-definitions';
 const cwd = process.env.ipcCWD || process.cwd()
 
 
