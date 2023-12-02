@@ -323,6 +323,17 @@ private handleInitialize(ws: WebSocket, data:any) {
       return
     }
     const clientInfo = this.socketStore.get(ws);
+    let subScribers = this.providerValidator.getMembersOfApplicationId(this.providers, clientInfo.appName, eventType.contextGetEvent, data.key);
+
+    this.socketStore.forEach((targetClientInfo , targetSocket ) => {
+      if(!subScribers.includes(targetClientInfo.appName)){
+        this.log(`The appName ${targetClientInfo.appName} not allowed for getting the context for the app ${clientInfo.appName}`, logType.info)
+        return
+      }else{
+        this.log(`The appName ${targetClientInfo.appName} allowed for getting the context for the app ${clientInfo.appName}`, logType.info)
+      }
+    });
+
     let currKey = {}
     if(data.key && data.key != "") {
       this.log(`Retrieving context data for ${data.key}`, logType.info);

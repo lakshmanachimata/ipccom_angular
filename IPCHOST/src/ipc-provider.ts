@@ -226,7 +226,7 @@ export class ProviderValidator  {
       if(providers[ai].provider == appName) {
         if(memberType == eventType.publishedEvent) {
           members = providers[ai].events;
-        }else if(memberType == eventType.contextChangeEvent) {
+        }else if(memberType == eventType.contextChangeEvent || memberType == eventType.contextGetEvent) {
           members = providers[ai].contexts;
         }else {
           return []
