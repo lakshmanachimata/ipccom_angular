@@ -323,17 +323,6 @@ private handleInitialize(ws: WebSocket, data:any) {
       return
     }
     const clientInfo = this.socketStore.get(ws);
-    let subScribers = this.providerValidator.getMembersOfApplicationId(this.providers, clientInfo.appName, eventType.contextGetEvent, data.key);
-
-    this.socketStore.forEach((targetClientInfo , targetSocket ) => {
-      if(!subScribers.includes(targetClientInfo.appName)){
-        this.log(`The appName ${targetClientInfo.appName} not allowed for getting the context for the app ${clientInfo.appName}`, logType.info)
-        return
-      }else{
-        this.log(`The appName ${targetClientInfo.appName} allowed for getting the context for the app ${clientInfo.appName}`, logType.info)
-      }
-    });
-
     let currKey = {}
     if(data.key && data.key != "") {
       this.log(`Retrieving context data for ${data.key}`, logType.info);
@@ -348,6 +337,40 @@ private handleInitialize(ws: WebSocket, data:any) {
       this.logger.info('Retrieving all context data');
       const allContexts = Object.assign({}, this.copyObjects(clientInfo));
       this.wsEmit(ws, eventType.contextGetEvent, data.key, JSON.stringify(allContexts), clientInfo)
+    }
+  }
+
+  private handleIpcGetContext(ws:WebSocket, data:any) {
+    if(!this.isClientInitialized(ws)) {
+      return
+    }
+    const clientInfo = this.socketStore.get(ws);
+    let subScribers = this.providerValidator.getMembersOfApplicationId(this.providers, clientInfo.appName, eventType.contextGetEvent, data.key);
+    let validSubscriber = false;
+
+    this.socketStore.forEach((targetClientInfo , targetSocket ) => {
+      if(!subScribers.includes(targetClientInfo.appName)){
+        this.log(`The appName ${targetClientInfo.appName} not allowed for getting the context for the app ${clientInfo.appName}`, logType.info)
+        validSubscriber = false;
+      }else{
+        this.log(`The appName ${targetClientInfo.appName} allowed for getting the context for the app ${clientInfo.appName}`, logType.info)
+        validSubscriber = true;
+      }
+    });
+    let currKey = {}
+    if(validSubscriber){
+      if(data.key && data.key != "") {
+        this.log(`Retrieving context data for ${data.key}`, logType.info);
+        for( let key of Array.from(this.currentContextStore.keys())) {
+          if(key.contextKey === data.key) {
+            currKey = key;
+          }
+        }
+        const currContext = this.currentContextStore.get(currKey);
+        this.wsEmit(ws, eventType.contextGetEvent, data.key, currContext ? currContext : null, clientInfo);
+      }
+    }else{
+      return;
     }
   }
 

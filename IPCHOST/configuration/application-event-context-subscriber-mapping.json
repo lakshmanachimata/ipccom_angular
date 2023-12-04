@@ -19,14 +19,14 @@
     ],
     "contexts": [
       {
-        "contextName": "get",
+        "contextName": "context1",
         "members": [
           "app3",
           "app2"
         ]
       },
       {
-        "contextName": "set",
+        "contextName": "context2",
         "members": [
           "app4"
         ]
@@ -51,13 +51,13 @@
     ],
     "contexts": [
       {
-        "contextName": "get",
+        "contextName": "context3",
         "members": [
           "app1"
         ]
       },
       {
-        "contextName": "set",
+        "contextName": "context4",
         "members": [
           "app3"
         ]
@@ -82,13 +82,13 @@
     ],
     "contexts": [
       {
-        "contextName": "get",
+        "contextName": "context5",
         "members": [
           "app1"
         ]
       },
       {
-        "contextName": "set",
+        "contextName": "context6",
         "members": [
           "app2"
         ]
@@ -113,13 +113,13 @@
     ],
     "contexts": [
       {
-        "contextName": "get",
+        "contextName": "context7",
         "members": [
           "app5"
         ]
       },
       {
-        "contextName": "set",
+        "contextName": "context8",
         "members": [
           "app3",
           "app1"
@@ -146,14 +146,14 @@
     ],
     "contexts": [
       {
-        "contextName": "get",
+        "contextName": "context9",
         "members": [
           "app4",
           "app1"
         ]
       },
       {
-        "contextName": "set",
+        "contextName": "context10",
         "members": [
           "app3",
           "app2"
